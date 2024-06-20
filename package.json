@@ -1,0 +1,39 @@
+{
+  "name": "perfil_3parejas-app",
+  "version": "1.0.0",
+  "main": "expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "^14.0.2",
+    "@react-navigation/bottom-tabs": "^6.5.20",
+    "@react-navigation/native": "^6.1.17",
+    "@react-navigation/stack": "^6.3.29",
+    "axios": "^1.7.2",
+    "core-js": "^3.23.3",
+    "expo": "~51.0.14",
+    "expo-av": "^14.0.5",
+    "expo-linear-gradient": "^13.0.2",
+    "expo-status-bar": "~1.12.1",
+    "react": "18.2.0",
+    "react-native": "^0.74.2",
+    "react-native-alert": "^1.0.3",
+    "react-native-appearance": "^0.0.0",
+    "react-native-flash-message": "^0.4.2",
+    "react-native-geocoding": "^0.5.0",
+    "react-native-gesture-handler": "^2.16.2",
+    "react-native-maps": "^1.14.0",
+    "react-native-paper": "^5.12.3",
+    "react-native-sweet-alert": "^3.5.0",
+    "react-native-toast-message": "^2.2.0",
+    "stacktrace-parser": "^0.1.10"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0"
+  },
+  "private": true
+}
