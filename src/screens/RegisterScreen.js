@@ -1,19 +1,22 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DebouncedSearchInput from '../screens/DebouncedSearchInput';
+import CustomAlert from '../estilos/CustomAlert'; // Importar el componente de alerta personalizada
 import styles from '../estilos/RegisterScreenStyles'; // Ajusta la ruta según tu estructura de archivos
+import * as Constantes from '../utils/constantes';
 
 const RegisterScreen = () => {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [password2, setPassword2] = useState('');
-  const [phone, setPhone] = useState('');
-  const [dui, setDui] = useState('');
+  const [confirmarClave, setConfirmarClave] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [address, setAddress] = useState('');
   const [location, setLocation] = useState({
     latitude: 13.69294,  // Latitud de San Salvador, El Salvador
@@ -21,17 +24,60 @@ const RegisterScreen = () => {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
 
   const navigation = useNavigation();
+  const ip = Constantes.IP;
 
-  const handleRegister = () => {
-    console.log('Nombre:', name);
-    console.log('Usuario:', username);
-    console.log('Correo:', email);
-    console.log('Contraseña:', password);
-    console.log('Telefono:', phone);
-    console.log('DUI:', dui);
-    console.log('Dirección:', address);
+  const handleRegister = async () => {
+    // Validación de los campos
+    if (
+      !name.trim() ||
+      !username.trim() ||
+      !email.trim() ||
+      !password.trim() ||
+      !confirmarClave.trim() ||
+      !address.trim()
+    ) {
+      setAlertMessage('Debes llenar todos los campos');
+      setAlertVisible(true);
+      return;
+    }
+
+    if (password !== confirmarClave) {
+      setAlertMessage('Las contraseñas no coinciden');
+      setAlertVisible(true);
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('nombreCliente', name);
+      formData.append('usuarioCliente', username);
+      formData.append('correoCliente', email);
+      formData.append('claveCliente', password);
+      formData.append('confirmarClave', confirmarClave);
+      formData.append('direccionCliente', address);
+
+      const response = await fetch(`${ip}/fontechpriv/api/services/public/cliente.php?action=signUpMovil`, {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+      if (data.status) {
+        setAlertMessage('Usuario creado correctamente');
+        setAlertVisible(true);
+        navigation.navigate('Login');
+      } else {
+        setAlertMessage(`Error: ${data.error}`);
+        setAlertVisible(true);
+      }
+    } catch (error) {
+      setAlertMessage('Ocurrió un error al intentar crear el usuario');
+      setAlertVisible(true);
+    }
   };
 
   const handleLoginRedirect = () => {
@@ -115,33 +161,30 @@ const RegisterScreen = () => {
         value={email}
         keyboardType="email-address"
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Contraseña"
-        onChangeText={text => setPassword(text)}
-        value={password}
-        secureTextEntry={true}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Repetir contraseña"
-        onChangeText={text => setPassword2(text)}
-        value={password2}
-        secureTextEntry={true}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Teléfono"
-        onChangeText={text => setPhone(text)}
-        value={phone}
-        keyboardType="phone-pad"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="DUI"
-        onChangeText={text => setDui(text)}
-        value={dui}
-      />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          placeholder="Contraseña"
+          onChangeText={text => setPassword(text)}
+          value={password}
+          secureTextEntry={!passwordVisible}
+        />
+        <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)} style={styles.eyeIcon}>
+          <Icon name={passwordVisible ? "eye" : "eye-off"} size={24} color="grey" />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          placeholder="Confirmar contraseña"
+          onChangeText={text => setConfirmarClave(text)}
+          value={confirmarClave}
+          secureTextEntry={!confirmPasswordVisible}
+        />
+        <TouchableOpacity onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)} style={styles.eyeIcon}>
+          <Icon name={confirmPasswordVisible ? "eye" : "eye-off"} size={24} color="grey" />
+        </TouchableOpacity>
+      </View>
       <View style={styles.addressContainer}>
         <DebouncedSearchInput
           onSearch={handleSearchAddress}
@@ -165,10 +208,13 @@ const RegisterScreen = () => {
       <TouchableOpacity onPress={handleLoginRedirect}>
         <Text style={styles.loginRedirectText}>¿Ya tienes cuenta? Inicia sesión</Text>
       </TouchableOpacity>
+      <CustomAlert
+        isVisible={alertVisible}
+        message={alertMessage}
+        onClose={() => setAlertVisible(false)}
+      />
     </ScrollView>
   );
 };
-
-
 
 export default RegisterScreen;

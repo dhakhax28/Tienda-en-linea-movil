@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Animated, StyleSheet, Easing, Image } from 'react-native'; // Asegúrate de importar Image de react-native
+import { View, Animated, StyleSheet, Easing, Image } from 'react-native';
 import Icon from '../img/calentamiento.png'; // Ruta de la imagen de splash screen
 import styles from '../estilos/SplashScreenStyles';
 
@@ -23,5 +23,3 @@ export default function SplashScreen() {
     </View>
   );
 }
-
-
