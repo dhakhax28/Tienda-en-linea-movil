@@ -1,75 +1,103 @@
-import React, { useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Animated, TouchableWithoutFeedback, Image } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import styles from '../estilos/CategoriaScreenStyles'; // Importa los estilos desde un archivo externo
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Animated, Image, Alert, RefreshControl } from 'react-native';
+import styles from '../estilos/CategoriaScreenStyles';
+import * as Constantes from '../utils/constantes';
 
 const DashboardScreen = ({ navigation }) => {
-  // Función para manejar la acción de cierre de sesión
+  const ip = Constantes.IP;
+  const [dataCategorias, setDataCategorias] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const animatedValuesRef = useRef([]);
+
   const handleLogout = () => {
     navigation.navigate('Login');
   };
 
-  // Definición de categorías con sus títulos, imágenes y colores de fondo
-  const categories = [
-    { title: 'Calzado playero', image: require('../img/playa.png'), bgColor: '#FFCC00' },
-    { title: 'Calzado casual', image: require('../img/casuales.png'), bgColor: '#FF6699' },
-    { title: 'Calzado deportivo', image: require('../img/deportivo.png'), bgColor: '#33CCFF' },
-    { title: 'Botines', image: require('../img/botines.png'), bgColor: '#33CCFF' },
-    { title: 'Sandalias', image: require('../img/sandalias.png'), bgColor: '#33CCFF' },
-    { title: 'Calzado para niño', image: require('../img/niños.png'), bgColor: '#33CCFF' }
-  ];
+  const getCategorias = async () => {
+    try {
+      const response = await fetch(`${ip}/fontechpriv/api/services/public/categoria.php?action=readAll`, {
+        method: 'GET',
+      });
+      const data = await response.json();
+      if (data.status) {
+        setDataCategorias(data.dataset);
+        animatedValuesRef.current = data.dataset.map(() => new Animated.Value(0));
+      } else {
+        Alert.alert('Error categorias', data.error);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Ocurrió un error al listar las categorias');
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
-  // Crea valores animados para cada categoría
-  const animatedValues = categories.map(() => useRef(new Animated.Value(0)).current);
+  const refreshScreen = () => {
+    setRefreshing(true);
+    getCategorias();
+  };
 
-  // Función para manejar la animación cuando se presiona una categoría
+  useEffect(() => {
+    getCategorias();
+  }, []);
+
   const handlePressIn = (index) => {
-    Animated.timing(animatedValues[index], {
-      toValue: 1,
-      duration: 200,
-      useNativeDriver: false,
-    }).start();
+    if (animatedValuesRef.current[index]) {
+      Animated.timing(animatedValuesRef.current[index], {
+        toValue: 1,
+        duration: 200,
+        useNativeDriver: false,
+      }).start();
+    }
   };
 
-  // Función para manejar la animación cuando se deja de presionar una categoría
   const handlePressOut = (index) => {
-    Animated.timing(animatedValues[index], {
-      toValue: 0,
-      duration: 200,
-      useNativeDriver: false,
-    }).start();
+    if (animatedValuesRef.current[index]) {
+      Animated.timing(animatedValuesRef.current[index], {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: false,
+      }).start();
+    }
   };
 
-  // Función para determinar el color de fondo animado de una categoría
   const cardBackgroundColor = (index, bgColor) => {
-    return animatedValues[index].interpolate({
-      inputRange: [0, 1],
-      outputRange: ['#fff', bgColor], // de blanco al color de fondo dado
-    });
+    if (animatedValuesRef.current[index]) {
+      return animatedValuesRef.current[index].interpolate({
+        inputRange: [0, 1],
+        outputRange: ['#fff', bgColor],
+      });
+    }
+    return '#fff';
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.title}>Categorías</Text>
-      <View style={styles.grid}>
-        {categories.map((category, index) => (
-          <TouchableWithoutFeedback
-            key={index}
-            onPressIn={() => handlePressIn(index)}
-            onPressOut={() => handlePressOut(index)}
-          >
-            <Animated.View style={[styles.card, { backgroundColor: cardBackgroundColor(index, category.bgColor) }]}>
-              <Image source={category.image} style={styles.image} />
-              <Text style={styles.cardTitle}>{category.title}</Text>
-            </Animated.View>
-          </TouchableWithoutFeedback>
-        ))}
-      </View>
-      
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Ionicons name="lock-closed" size={24} color="black" />
-      </TouchableOpacity>
-    </ScrollView>
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={refreshScreen} />
+        }
+      >
+        <View style={styles.grid}>
+          {dataCategorias.map((category, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => navigation.navigate('Producto', { idCategoria: category.id_categoria })} // Asegúrate de que el nombre sea 'Producto'
+              onPressIn={() => handlePressIn(index)}
+              onPressOut={() => handlePressOut(index)}
+            >
+              <Animated.View style={[styles.card, { backgroundColor: cardBackgroundColor(index, '#33CCFF') }]}>
+                <Image source={{ uri: `${ip}/fontechpriv/api/images/categorias/${category.imagen}` }} style={styles.image} />
+                <Text style={styles.cardTitle}>{category.nombre_categoria}</Text>
+              </Animated.View>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 

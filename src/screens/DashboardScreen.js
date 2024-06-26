@@ -21,7 +21,6 @@ const DashboardScreen = ({ navigation }) => {
 
   const categories = [
     { title: 'Categorías', icon: 'grid-outline' },
-    { title: 'Productos', icon: 'pricetag-outline' },
     { title: 'Ofertas', icon: 'gift-outline' },
     { title: 'Historial', icon: 'time-outline' }
   ];
@@ -41,15 +40,6 @@ const DashboardScreen = ({ navigation }) => {
       gestureEnabled={false}
       gestureDirection="horizontal"
     >
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#000" style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Buscar..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      </View>
 
       <Image
         source={{ uri: images[currentImageIndex] }}
@@ -66,8 +56,6 @@ const DashboardScreen = ({ navigation }) => {
             onPress={() => {
               if (category.title === 'Categorías') {
                 navigation.navigate('Categorias');
-              } else if (category.title === 'Productos') {
-                navigation.navigate('Producto');
               } else if (category.title === 'Ofertas') {
                 navigation.navigate('Ofertas');
               } else if (category.title === 'Historial') {

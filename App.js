@@ -23,87 +23,81 @@ import OfertasScreen from './src/screens/OfertasScreen';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const DashboardTabNavigator = () => {
-  return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
-      <Tab.Screen
-        name="Dashboard"
-        component={DashboardScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
-          ),
-          tabBarLabel: () => null,
-        }}
-      />
-      <Tab.Screen
-        name="Categorias"
-        component={CategoriaScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="albums" size={size} color={color} />
-          ),
-          tabBarLabel: () => null, // Esto oculta el nombre de la pestaña
-        }}
-      />
-
-      <Tab.Screen
-        name="Carrito"
-        component={CarritoScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="cart" size={size} color={color} />
-          ),
-          tabBarLabel: () => null,
-        }}
-
-      />
-
-       <Tab.Screen
-        name="Mi Perfil"
-        component={PerfilScreen}
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
-          ),
-          tabBarLabel: () => null,
-        }}
-      />
-    </Tab.Navigator>
-  );
-};
+const DashboardTabNavigator = () => (
+  <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Screen
+      name="Dashboard"
+      component={DashboardScreen}
+      options={{
+        tabBarIcon: ({ color, size }) => (
+          <Ionicons name="home" size={size} color={color} />
+        ),
+        tabBarLabel: () => null,
+      }}
+    />
+    <Tab.Screen
+      name="Categorias"
+      component={CategoriaScreen}
+      options={{
+        tabBarIcon: ({ color, size }) => (
+          <Ionicons name="albums" size={size} color={color} />
+        ),
+        tabBarLabel: () => null,
+      }}
+    />
+    <Tab.Screen
+      name="Carrito"
+      component={CarritoScreen}
+      options={{
+        tabBarIcon: ({ color, size }) => (
+          <Ionicons name="cart" size={size} color={color} />
+        ),
+        tabBarLabel: () => null,
+      }}
+    />
+    <Tab.Screen
+      name="Mi Perfil"
+      component={PerfilScreen}
+      options={{
+        tabBarIcon: ({ color, size }) => (
+          <Ionicons name="person" size={size} color={color} />
+        ),
+        tabBarLabel: () => null,
+      }}
+    />
+  </Tab.Navigator>
+);
 
 export default function App() {
   const [isShowSplash, setIsShowSplash] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       setIsShowSplash(false);
     }, 3000);
+    return () => clearTimeout(timeout); // Limpia el timeout si el componente se desmonta
   }, []);
 
+  if (isShowSplash) {
+    return <SplashScreen />;
+  }
+
   return (
-    <>
-      {isShowSplash ? (
-        <SplashScreen />
-      ) : (
-        <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Register" component={RegisterScreen} />
-            <Stack.Screen name="PasswordRecovery" component={PasswordRecoveryScreen} />
-            <Stack.Screen name="DashboardTabs" component={DashboardTabNavigator} />
-            <Stack.Screen name="Perfil" component={PerfilScreen} />
-            <Stack.Screen name="MiPerfil" component={MiPerfilScreen} />
-            <Stack.Screen name="Producto" component={ProductoScreen} />
-            <Stack.Screen name="Carrito" component={CarritoScreen} />
-            <Stack.Screen name="Historial" component={HistorialScreen} />
-            <Stack.Screen name="Ofertas" component={OfertasScreen} />
-            <Stack.Screen name="TerminosyCondiciones" component={TerminosCondicionesScreen} />
-            <Stack.Screen name="DetallesProducto" component={DetallesProductoScreen} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      )}
-    </>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="PasswordRecovery" component={PasswordRecoveryScreen} />
+        <Stack.Screen name="DashboardTabs" component={DashboardTabNavigator} />
+        <Stack.Screen name="Perfil" component={PerfilScreen} />
+        <Stack.Screen name="MiPerfil" component={MiPerfilScreen} />
+        <Stack.Screen name="Producto" component={ProductoScreen} />
+        <Stack.Screen name="Carrito" component={CarritoScreen} />
+        <Stack.Screen name="Historial" component={HistorialScreen} />
+        <Stack.Screen name="Ofertas" component={OfertasScreen} />
+        <Stack.Screen name="TerminosyCondiciones" component={TerminosCondicionesScreen} />
+        <Stack.Screen name="DetallesProducto" component={DetallesProductoScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }

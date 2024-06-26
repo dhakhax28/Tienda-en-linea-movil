@@ -6,12 +6,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#f5f5f5', // light grey background color for a modern look
-    paddingVertical: 20,
+    paddingVertical: 65,
   },
   title: {
-    fontSize: 26,
+    fontSize: 30,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 30,
     color: '#333', // dark grey color for the title
   },
   sectionTitle: {
@@ -25,15 +25,15 @@ const styles = StyleSheet.create({
     width: '90%',
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between', // Space between the cards
     alignItems: 'center',
   },
   card: {
-    width: '40%',
+    width: '100%', // Adjust the width to fit two cards in a row with some margin
     backgroundColor: '#fff',
-    borderRadius: 15,
+    borderRadius: 18,
     padding: 20,
-    marginBottom: 20,
+    margin: 10, // Add margin for spacing between cards
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 5 },
