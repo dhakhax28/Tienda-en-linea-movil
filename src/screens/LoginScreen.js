@@ -38,16 +38,27 @@ const LoginScreen = ({ navigation }) => {
       formData.append('UsuarioCliente', username);
       formData.append('clave', password);
       
-      const response = await fetch(`${ip}/fontechpriv/api/services/public/cliente.php?action=logIn`, {
+      const url = `${ip}/fontechpriv/api/services/public/cliente.php?action=logIn`;
+      console.log('URL solicitada:', url); // Para verificar la URL
+
+      const response = await fetch(url, {
         method: 'POST',
         body: formData,
       });
 
-      const data = await response.json();
-      if (data.status) {
-        navigation.navigate('DashboardTabs');
-      } else {
-        showLoginErrorAlert(); // Mostrar alerta personalizada en caso de error
+      const responseText = await response.text(); // Obtén la respuesta como texto
+
+      try {
+        const data = JSON.parse(responseText); // Intenta parsear la respuesta como JSON
+        if (data.status) {
+          navigation.navigate('DashboardTabs');
+        } else {
+          showLoginErrorAlert(); // Mostrar alerta personalizada en caso de error
+        }
+      } catch (jsonError) {
+        console.error('Error al parsear JSON:', jsonError);
+        console.error('Respuesta recibida:', responseText);
+        Alert.alert('Error', 'Ocurrió un error al procesar la respuesta del servidor');
       }
     } catch (error) {
       Alert.alert('Error', 'Ocurrió un error al iniciar sesión');
@@ -64,17 +75,27 @@ const LoginScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${ip}/fontechpriv/api/services/public/cliente.php?action=logOut`, {
+      const url = `${ip}/fontechpriv/api/services/public/cliente.php?action=logOut`;
+      console.log('URL solicitada:', url); // Para verificar la URL
+
+      const response = await fetch(url, {
         method: 'GET'
       });
-  
-      const data = await response.json();
-  
-      if (data.status) {
-        Alert.alert("Sesión finalizada");
-        // Aquí podrías agregar cualquier otra lógica necesaria al cerrar sesión, como limpiar el estado de usuario, etc.
-      } else {
-        Alert.alert('Error', data.error);
+
+      const responseText = await response.text(); // Obtén la respuesta como texto
+
+      try {
+        const data = JSON.parse(responseText); // Intenta parsear la respuesta como JSON
+        if (data.status) {
+          Alert.alert("Sesión finalizada");
+          // Aquí podrías agregar cualquier otra lógica necesaria al cerrar sesión, como limpiar el estado de usuario, etc.
+        } else {
+          Alert.alert('Error', data.error);
+        }
+      } catch (jsonError) {
+        console.error('Error al parsear JSON:', jsonError);
+        console.error('Respuesta recibida:', responseText);
+        Alert.alert('Error', 'Ocurrió un error al procesar la respuesta del servidor');
       }
     } catch (error) {
       console.error(error, "Error desde Catch");
