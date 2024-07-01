@@ -8,7 +8,7 @@ import * as Constantes from '../utils/constantes';
 const ProductoScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
-  const { idCategoria } = route.params; //  Asegúrate de que estás recibiendo el parámetro correctamente
+  const { idCategoria } = route.params;
   const [searchText, setSearchText] = useState('');
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,9 +18,9 @@ const ProductoScreen = () => {
 
   const fetchProducts = async () => {
     try {
-      const formdData= new FormData();
-      console.log('valor de id categoria', idCategoria)
-      formdData.append('idCategoria', idCategoria)
+      const formdData = new FormData();
+      console.log('valor de id categoria', idCategoria);
+      formdData.append('idCategoria', idCategoria);
       const response = await fetch(`${ip}/fontechpriv/api/services/public/producto.php?action=readProductosCategoria`, {
         method: 'POST',
         body: formdData,

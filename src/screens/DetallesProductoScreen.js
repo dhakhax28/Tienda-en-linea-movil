@@ -1,103 +1,176 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ActivityIndicator, RefreshControl, TextInput, ScrollView } from 'react-native'; // Asegúrate de importar ScrollView de 'react-native'
 import { Ionicons } from '@expo/vector-icons';
-import CarritoScreen from './CarritoScreen'; // Importa la pantalla CarritoScreen
+import { useRoute, useNavigation } from '@react-navigation/native';
 import styles from '../estilos/DetallesProductosScreen'; // Importa los estilos desde un archivo externo
+import * as Constantes from '../utils/constantes';
 
-const DetallesProductoScreen = ({ route, navigation }) => {
-  // Extrae los datos del producto desde route.params
-  const { title, description, image } = route.params.producto;
+const DetallesProductoScreen = () => {
+  const navigation = useNavigation();
+  const route = useRoute();
+  const { idProducto } = route.params;
+  const [producto, setProducto] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [cantidadProducto, setCantidadProducto] = useState('1'); // Inicializar con una cantidad predeterminada de 1
 
-  // Estado para controlar la visibilidad de la alerta
-  const [mostrarAlerta, setMostrarAlerta] = useState(false);
+  const ip = Constantes.IP;
+
+  // Función para obtener los detalles del producto desde la API
+  const fetchProducto = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('idProducto', idProducto);
+      const response = await fetch(`${ip}/fontechpriv/api/services/public/producto.php?action=readOne`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await response.json();
+      if (data.status) {
+        setProducto(data.dataset);
+      } else {
+        Alert.alert('Error', data.message);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Ocurrió un error al obtener los detalles del producto');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  // Función para refrescar la pantalla
+  const refreshScreen = () => {
+    setRefreshing(true);
+    fetchProducto();
+  };
+
+  useEffect(() => {
+    fetchProducto();
+  }, []);
 
   // Función para agregar el producto al carrito
-  const agregarAlCarrito = () => {
-    // Mostrar la alerta
-    setMostrarAlerta(true);
+  const agregarAlCarrito = async () => {
+    const cantidadNumerica = parseInt(cantidadProducto, 10);
+    if (isNaN(cantidadNumerica) || cantidadNumerica <= 0) {
+      Alert.alert('Error', 'Por favor, ingresa una cantidad válida');
+      return;
+    }
 
-    // Configurar para que la alerta desaparezca después de 2 segundos
-    setTimeout(() => {
-      setMostrarAlerta(false);
-    }, 2000);
+    try {
+      const formData = new FormData();
+      formData.append('idProducto', idProducto);
+      formData.append('cantidadProducto', cantidadProducto);
+
+      const response = await fetch(`${ip}/fontechpriv/api/services/public/pedido.php?action=createDetail`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.status) {
+        Alert.alert('Éxito', 'Producto añadido al carrito');
+        navigation.navigate('Carrito', { idProducto, cantidadProducto: cantidadNumerica });
+      } else {
+        Alert.alert('Error', data.message);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Ocurrió un error al agregar el producto al carrito ojo');
+    }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+  if (!producto) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text style={styles.errorText}>No se encontraron detalles del producto</Text>
+      </View>
+    );
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      {/* Alerta que se muestra cuando se agrega el producto al carrito */}
-      {mostrarAlerta && (
-        <View style={styles.alerta}>
-          <Text style={styles.alertaTexto}>Producto añadido al carrito</Text>
-        </View>
-      )}
-
-      {/* Botón para regresar a la pantalla anterior */}
+      <ScrollView
+        contentContainerStyle={styles.scrollViewContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={refreshScreen} />
+        }
+      ></ScrollView>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={24} color="#000" />
       </TouchableOpacity>
 
-      {/* Imagen del producto */}
-      <Image source={{ uri: image }} style={styles.image} />
+      <Image source={{ uri: `${ip}/fontechpriv/api/images/productos/${producto.imagen}` }} style={styles.image} />
 
-      {/* Opciones de colores */}
-      <View style={styles.colorOptions}>
-        <View style={[styles.colorOption, { backgroundColor: '#FFFFFF' }]} />
-        <View style={[styles.colorOption, { backgroundColor: '#F0F0F0' }]} />
-        <View style={[styles.colorOption, { backgroundColor: '#C0C0C0' }]} />
-        <View style={[styles.colorOption, { backgroundColor: '#A0A0A0' }]} />
-        <View style={[styles.colorOption, { backgroundColor: '#2020A0' }]} />
-      </View>
-
-      {/* Opciones de tallas */}
-      <View style={styles.sizeOptions}>
-        {['14', '20', '24', '32', '40', '42'].map(size => (
-          <TouchableOpacity key={size} style={styles.sizeOption}>
-            <Text style={styles.sizeText}>{size}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Título y descripción del producto */}
-      <Text style={styles.title}>{title}</Text>
-      <Text style={styles.description}>{description}</Text>
-
-      {/* Detalles del producto */}
+      <Text style={styles.title}>{producto.nombre_producto}</Text>
+      <Text style={styles.description}>{producto.descripcion}</Text>
       <View style={styles.detailsContainer}>
         <View style={styles.detailsRow}>
-          <Text style={styles.detailsLabel}>Categoría:</Text>
-          <Text style={styles.detailsValue}>Running</Text>
-        </View>
-        <View style={styles.detailsRow}>
           <Text style={styles.detailsLabel}>Marca:</Text>
-          <Text style={styles.detailsValue}>Nike</Text>
+          <Text style={styles.detailsValue}>{producto.marca}</Text>
         </View>
         <View style={styles.detailsRow}>
-          <Text style={styles.detailsLabel}>Género:</Text>
-          <Text style={styles.detailsValue}>Zapatillas para correr</Text>
+          <Text style={styles.detailsLabel}>Almacenamiento Interno:</Text>
+          <Text style={styles.detailsValue}>{producto.capacidad_memoria_interna_celular}</Text>
         </View>
         <View style={styles.detailsRow}>
-          <Text style={styles.detailsLabel}>Existencias:</Text>
-          <Text style={styles.detailsValue}>23</Text>
+          <Text style={styles.detailsLabel}>Ram:</Text>
+          <Text style={styles.detailsValue}>{producto.ram_celular}</Text>
         </View>
         <View style={styles.detailsRow}>
-          <Text style={styles.detailsLabel}>Precio:</Text>
-          <Text style={styles.detailsValue}>$24.95</Text>
+          <Text style={styles.detailsLabel}>Tamaño de la pantalla:</Text>
+          <Text style={styles.detailsValue}>{producto.pantalla_tamaño}</Text>
         </View>
         <View style={styles.detailsRow}>
-          <Text style={styles.detailsLabel}>Material:</Text>
-          <Text style={styles.detailsValue}>Tela</Text>
+          <Text style={styles.detailsLabel}>Cámara trasera:</Text>
+          <Text style={styles.detailsValue}>{producto.camara_trasera_celular}</Text>
         </View>
         <View style={styles.detailsRow}>
-          <Text style={styles.detailsLabel}>Código:</Text>
-          <Text style={styles.detailsValue}>C1200</Text>
+          <Text style={styles.detailsLabel}>Cámara Frontal:</Text>
+          <Text style={styles.detailsValue}>{producto.camara_frontal_celular}</Text>
         </View>
         <View style={styles.detailsRow}>
-          <Text style={styles.detailsLabel}>Descuento:</Text>
-          <Text style={styles.detailsValue}>0%</Text>
+          <Text style={styles.detailsLabel}>Procesador:</Text>
+          <Text style={styles.detailsValue}>{producto.procesador_celular}</Text>
+        </View>
+        <View style={styles.detailsRow}>
+          <Text style={styles.detailsLabel}>Sistema operativo:</Text>
+          <Text style={styles.detailsValue}>{producto.sistema_operativo_celular}</Text>
         </View>
       </View>
 
-      {/* Botón para agregar al carrito */}
+      <View style={styles.pricingInfoContainer}>
+        <View style={styles.pricingInfoRow}>
+          <Text style={styles.pricingInfoLabel}>Precio unitario (US$):</Text>
+          <Text style={styles.pricingInfoValue}>{producto.precio}</Text>
+        </View>
+        <View style={styles.pricingInfoRow}>
+          <Text style={styles.pricingInfoLabel}>Existencias:</Text>
+          <Text style={styles.pricingInfoValue}>{producto.existencias}</Text>
+        </View>
+        <View style={styles.pricingInfoRow}>
+          <Text style={styles.pricingInfoLabel}>Descuento:</Text>
+          <Text style={styles.pricingInfoValue}>{producto.valor_oferta}</Text>
+        </View>
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Cantidad</Text>
+          <TextInput
+            style={styles.input}
+            placeholder=""
+            keyboardType="numeric"
+            onChangeText={setCantidadProducto}
+            value={cantidadProducto.toString()}
+          />
+        </View>
+      </View>
       <TouchableOpacity style={styles.addButton} onPress={agregarAlCarrito}>
         <Text style={styles.addButtonText}>Añadir al carrito</Text>
       </TouchableOpacity>

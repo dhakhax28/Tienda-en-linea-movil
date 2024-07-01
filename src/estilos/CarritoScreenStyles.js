@@ -43,6 +43,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
+    marginTop: 5, // Separación adicional desde arriba
     color: '#333',
   },
   ofertaDescription: {
@@ -54,11 +55,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: 5, // Separación adicional desde arriba
   },
   ofertaPrice: {
     fontSize: 14,
     fontWeight: 'bold',
     color: '#333',
+    marginTop: 5, // Separación adicional desde arriba
   },
   quantityContainer: {
     flexDirection: 'row',
@@ -94,6 +97,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 5,
     elevation: 5,
+    left: 150,
+    marginTop: 10, // Separación adicional desde arriba
   },
 });
 

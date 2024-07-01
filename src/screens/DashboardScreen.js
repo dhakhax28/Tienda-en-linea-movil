@@ -26,10 +26,10 @@ const DashboardScreen = ({ navigation }) => {
   ];
 
   const images = [
-    'https://eldinero.com.do/wp-content/uploads/calzado-deportivo-adidas.jpg',
-    'https://media.gq.com.mx/photos/5df2c28cf428fa0008c870a5/master/w_7184,c_limit/los-10-mejores-tenis-en-amazon-para-empezar-el-2020.jpg',
-    'https://img.freepik.com/fotos-premium/par-zapatillas-deportivas-adidas-iluminan-habitacion-oscura_853645-10469.jpg',
-    'https://www.experimenta.es/wp-content/uploads/2016/12/zapatillas-biodegradables-de-fibra-de-seda-de-arana-artificial-de-adidas-800x599.jpg',
+    'https://images.pexels.com/photos/5989894/pexels-photo-5989894.jpeg',
+    'https://images.pexels.com/photos/699122/pexels-photo-699122.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/20348034/pexels-photo-20348034/free-photo-of-telefono-inteligente-tecnologia-negro-samsung.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/12563780/pexels-photo-12563780.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
   ];
 
   return (

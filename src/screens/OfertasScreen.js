@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import styles from '../estilos/OfertasScreenStyles'; // Importa los estilos desde un archivo externo
 
 // Importa la imagen de "Promo" desde el directorio de imágenes
-import PromoImage from '../img/ofertas.png'; // Ajusta la ruta según donde hayas guardado la imagen
+import PromoImage from '../img/ofertapura.jpg'; // Ajusta la ruta según donde hayas guardado la imagen
 
 const OfertasScreen = ({ navigation }) => {
   // Arreglo de ofertas con objetos de ejemplo
@@ -36,7 +36,6 @@ const OfertasScreen = ({ navigation }) => {
       <Image source={{ uri: item.image }} style={styles.ofertaImage} />
       <View style={styles.ofertaDetails}>
         <Text style={styles.ofertaTitle}>{item.title}</Text>
-        <Text style={styles.ofertaDescription}>{item.description}</Text>
         <View style={styles.ofertaPriceContainer}>
           <Text style={styles.ofertaPrice}>${item.price.toFixed(2)}</Text>
           {item.discount > 0 && (
