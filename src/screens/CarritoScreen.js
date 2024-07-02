@@ -17,6 +17,9 @@ const CarritoScreen = ({ navigation, route }) => {
       const data = await response.json();
       if (data.status) {
         setCarrito(data.dataset);
+        if (data.dataset.length === 0) {
+          Alert.alert('Carrito vacío', 'No hay productos en el carrito.');
+        }
       } else {
         Alert.alert('Error', data.error);
       }
@@ -188,9 +191,6 @@ const CarritoScreen = ({ navigation, route }) => {
           />
         }
       />
-      {carrito.length === 0 && (
-        <Text style={styles.emptyCarritoText}>No hay productos en el carrito.</Text>
-      )}
     </View>
   );
 };
