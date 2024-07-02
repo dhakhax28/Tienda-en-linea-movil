@@ -12,7 +12,7 @@ const DetallesProductoScreen = () => {
   const [producto, setProducto] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [cantidadProducto, setCantidadProducto] = useState('1'); // Inicializar con una cantidad predeterminada de 1
+  const [cantidadProducto, setCantidadProducto] = useState(''); // Inicializar con una cadena vacía para que el campo esté vacío inicialmente
 
   const ip = Constantes.IP;
 
