@@ -1,61 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, TextInput, ActivityIndicator, RefreshControl, Alert } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons'; // Importa el icono de Ionicons
-import { useNavigation } from '@react-navigation/native'; // Importa el hook de navegación
-import styles from '../estilos/CategoriaScreenStyles'; // Importa los estilos desde un archivo externo
-import * as Constantes from '../utils/constantes'; // Importa constantes, probablemente IP
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
+import styles from '../estilos/CategoriaScreenStyles';
+import * as Constantes from '../utils/constantes';
 
 const DashboardScreen = () => {
   const navigation = useNavigation();
-  const [searchText, setSearchText] = useState(''); // Estado para el texto de búsqueda
-  const [categories, setCategories] = useState([]); // Estado para almacenar las categorías
-  const [loading, setLoading] = useState(true); // Estado para controlar el estado de carga
-  const [refreshing, setRefreshing] = useState(false); // Estado para el control de la acción de refrescar
+  const [searchText, setSearchText] = useState('');
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const ip = Constantes.IP; // Variable para la dirección IP o la URL base de la API
+  const ip = Constantes.IP;
 
-  // Función asincrónica para obtener las categorías desde la API
   const fetchCategories = async () => {
     try {
       const response = await fetch(`${ip}/fontechpriv/api/services/public/categoria.php?action=readAll`, {
-        method: 'GET', // Método GET para obtener datos
+        method: 'GET',
       });
-      const data = await response.json(); // Convertir la respuesta a JSON
+      const data = await response.json();
       if (data.status) {
-        setCategories(data.dataset); // Si hay éxito, establece las categorías en el estado
+        setCategories(data.dataset);
       } else {
-        Alert.alert('Error', data.message); // Muestra una alerta en caso de error desde la API
+        Alert.alert('Error', data.message);
       }
     } catch (error) {
-      Alert.alert('Error', 'Ocurrió un error al obtener las categorías'); // Muestra una alerta en caso de excepción
+      Alert.alert('Error', 'Ocurrió un error al obtener las categorías');
     } finally {
-      setLoading(false); // Establece loading en false para indicar que la carga ha finalizado
-      setRefreshing(false); // Establece refreshing en false para indicar que el refresco ha finalizado
+      setLoading(false);
+      setRefreshing(false);
     }
   };
 
   useEffect(() => {
-    fetchCategories(); // Llama a fetchCategories al montar el componente
-  }, []); // El segundo argumento de useEffect es un array vacío, por lo que se ejecuta solo una vez al montar
+    fetchCategories();
+  }, []);
 
-  // Función para manejar la acción de refrescar
   const handleRefresh = () => {
-    setRefreshing(true); // Establece refreshing en true para mostrar el indicador de refresco
-    fetchCategories(); // Llama a fetchCategories para obtener las categorías actualizadas
+    setRefreshing(true);
+    fetchCategories();
   };
 
-  // Filtra las categorías basado en el texto de búsqueda ingresado
   const filteredCategories = categories.filter((category) =>
     category.nombre_categoria.toLowerCase().includes(searchText.toLowerCase())
   );
 
-  // Función para manejar la acción de "Ver más" en una categoría específica
   const handleVerMas = (category) => {
-    // navigation.navigate('Producto', { idCategoria: category.id_categoria }); // Comentado para pruebas sin navegación
-    console.log('Ver más:', category.nombre_categoria); // Muestra el nombre de la categoría en la consola
+    navigation.navigate('Producto', { idCategoria: category.id_categoria });
   };
 
-  // Renderiza un indicador de carga mientras se obtienen las categorías
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -64,7 +58,6 @@ const DashboardScreen = () => {
     );
   }
 
-  // Renderiza la pantalla principal con las categorías y la opción de refrescar
   return (
     <ScrollView
       style={styles.container}
@@ -88,4 +81,4 @@ const DashboardScreen = () => {
   );
 };
 
-export default DashboardScreen; // Exporta el componente DashboardScreen
+export default DashboardScreen;
