@@ -14,6 +14,17 @@ const PerfilScreen = () => {
     Linking.openURL('https://www.facebook.com/Comodos.sv');
   };
 
+ // Función para abrir enlace de Instagram
+ const abrirInstagram = () => {
+  Linking.openURL('https://www.instagram.com/comodos.sv/');
+};
+
+ // Función para abrir enlace de Whatsapp
+ const abrirWhatsapp = () => {
+  Linking.openURL('https://api.whatsapp.com/message/26YDZFGJ5O3CF1?autoload=1&app_absent=0');
+};
+
+
   // Función para navegar a la pantalla 'MiPerfil'
   const handleMiPerfilPress = () => {
     navigation.navigate('MiPerfil');
@@ -50,10 +61,10 @@ const PerfilScreen = () => {
           <TouchableOpacity onPress={abrirFacebook}>
             <FontAwesome name="facebook" size={30} color="#000000" />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={abrirInstagram}>
             <FontAwesome name="instagram" size={30} color="#000000" />
           </TouchableOpacity>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={abrirWhatsapp}>
             <FontAwesome name="whatsapp" size={30} color="#000000" />
           </TouchableOpacity>
         </View>

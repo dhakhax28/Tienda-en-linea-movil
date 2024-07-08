@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native'; // Añade ActivityIndicator aquí
+import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import styles from '../estilos/MiPerfilScreenStyles'; // Importa los estilos desde un archivo externo
 import * as Constantes from '../utils/constantes';
 
@@ -19,6 +19,12 @@ const MiPerfilScreen = () => {
   const correoRef = useRef(null);
   const direccionRef = useRef(null);
 
+  // Estados para los valores originales
+  const nombreOriginal = useRef('');
+  const usernameOriginal = useRef('');
+  const correoOriginal = useRef('');
+  const direccionOriginal = useRef('');
+
   // Función para obtener y mostrar el perfil del usuario
   const fetchProfile = async () => {
     try {
@@ -27,9 +33,13 @@ const MiPerfilScreen = () => {
 
       if (data.status) {
         setNombre(data.dataset.nombre);
+        nombreOriginal.current = data.dataset.nombre;
         setUsername(data.dataset.usuario);
+        usernameOriginal.current = data.dataset.usuario;
         setCorreo(data.dataset.correo);
+        correoOriginal.current = data.dataset.correo;
         setDireccion(data.dataset.direccion);
+        direccionOriginal.current = data.dataset.direccion;
       } else {
         Alert.alert('Error', data.error);
       }
@@ -59,27 +69,17 @@ const MiPerfilScreen = () => {
 
       if (data.status) {
         Alert.alert('Perfil actualizado', 'Los datos del perfil han sido actualizados exitosamente');
+        // Actualizar valores originales después de la actualización exitosa
+        nombreOriginal.current = nombre;
+        usernameOriginal.current = username;
+        correoOriginal.current = correo;
+        direccionOriginal.current = direccion;
       } else {
         Alert.alert('Error', 'No se pudo actualizar el perfil');
       }
     } catch (error) {
       Alert.alert('Error', 'Ocurrió un error al actualizar el perfil');
     }
-  };
-
-  // Función para manejar la cancelación y limpiar los campos
-  const handleDelete = () => {
-    // Limpiar los estados
-    setNombre('');
-    setUsername('');
-    setCorreo('');
-    setDireccion('');
-
-    // Limpiar los TextInput utilizando las referencias
-    nombreRef.current.clear();
-    usernameRef.current.clear();
-    correoRef.current.clear();
-    direccionRef.current.clear();
   };
 
   useEffect(() => {
@@ -139,6 +139,7 @@ const MiPerfilScreen = () => {
           value={correo}
         />
       </View>
+
       {/* Contenedor para el campo Dirección */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Dirección</Text>
@@ -155,11 +156,6 @@ const MiPerfilScreen = () => {
         {/* Botón de Actualizar */}
         <TouchableOpacity style={[styles.button, styles.updateButton]} onPress={handleUpdate}>
           <Text style={[styles.buttonText, styles.updateButtonText]}>Actualizar</Text>
-        </TouchableOpacity>
-
-        {/* Botón de Cancelar */}
-        <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={handleDelete}>
-          <Text style={[styles.buttonText, styles.deleteButtonText]}>Cancelar</Text>
         </TouchableOpacity>
       </View>
     </View>

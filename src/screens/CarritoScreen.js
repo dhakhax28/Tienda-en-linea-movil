@@ -148,33 +148,31 @@ const CarritoScreen = ({ navigation }) => {
   }, [carrito]);
 
   // Renderizar cada elemento del carrito
-  const renderOfertaItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.ofertaCard}
-      onPress={() => navigation.navigate('DetallesProducto', { idProducto: item.id_detalle_reserva })}
-    >
-      <Image source={{ uri: `${ip}/fontechpriv/api/images/productos/${item.imagen}` }} style={styles.ofertaImage} />
-      <View style={styles.ofertaDetails}>
-        <Text style={styles.ofertaTitle}>{item.nombre_producto}</Text>
-        <Text style={styles.ofertaPrice}>Precio Unitario: ${item.precio_unitario}</Text>
-        {item.valor_oferta && (
-          <Text style={styles.ofertaPrice}>Oferta: %{item.valor_oferta}</Text>
-        )}
-        <View style={styles.quantityContainer}>
-          <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange(item, 'decrease')}>
-            <Text style={styles.quantityButtonText}>-</Text>
-          </TouchableOpacity>
-          <Text style={styles.quantity}>{item.cantidad}</Text>
-          <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange(item, 'increase')}>
-            <Text style={styles.quantityButtonText}>+</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id_detalle_reserva)}>
-            <Text style={{ color: '#fff', fontWeight: 'bold' }}>Eliminar</Text>
-          </TouchableOpacity>
-        </View>
+  // Renderizar cada elemento del carrito
+const renderOfertaItem = ({ item }) => (
+  <TouchableOpacity style={styles.ofertaCard}>
+    <Image source={{ uri: `${ip}/fontechpriv/api/images/productos/${item.imagen}` }} style={styles.ofertaImage} />
+    <View style={styles.ofertaDetails}>
+      <Text style={styles.ofertaTitle}>{item.nombre_producto}</Text>
+      <Text style={styles.ofertaPrice}>Precio Unitario: ${item.precio_unitario}</Text>
+      {item.valor_oferta && (
+        <Text style={styles.ofertaPrice}>Oferta: %{item.valor_oferta}</Text>
+      )}
+      <View style={styles.quantityContainer}>
+        <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange(item, 'decrease')}>
+          <Text style={styles.quantityButtonText}>-</Text>
+        </TouchableOpacity>
+        <Text style={styles.quantity}>{item.cantidad}</Text>
+        <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange(item, 'increase')}>
+          <Text style={styles.quantityButtonText}>+</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id_detalle_reserva)}>
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>Eliminar</Text>
+        </TouchableOpacity>
       </View>
-    </TouchableOpacity>
-  );
+    </View>
+  </TouchableOpacity>
+);
 
   // Función para manejar la acción de finalizar la compra
   const finalizarCompra = async () => {
