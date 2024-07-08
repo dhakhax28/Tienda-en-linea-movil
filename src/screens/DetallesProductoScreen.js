@@ -68,16 +68,16 @@ const DetallesProductoScreen = () => {
 
       if (data.status) {
         Alert.alert('Éxito', 'Producto añadido al carrito');
-        navigation.navigate('DashboardTabs', {
-          screen: 'Carrito',
-          params: { idProducto, cantidadProducto: cantidadNumerica }
+        navigation.navigate('Carrito', { // Navega al CarritoScreen
+          idProducto, 
+          cantidadProducto: cantidadNumerica
         });
         
       } else {
         Alert.alert('Error', data.message);
       }
     } catch (error) {
-      Alert.alert('Error', 'Ocurrió un error al agregar el producto al carrito ojo');
+      Alert.alert('Error', 'Ocurrió un error al agregar el producto al carrito');
     }
   };
 

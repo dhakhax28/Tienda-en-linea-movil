@@ -32,33 +32,46 @@ const CarritoScreen = ({ navigation }) => {
 
   // Función para manejar el cambio de cantidad de un producto en el carrito
   const handleQuantityChange = async (item, type) => {
-    const newCantidad = type === 'increase' ? item.CANTIDAD + 1 : item.CANTIDAD - 1;
+    let newCantidad = item.cantidad;
+  
+    if (type === 'increase') {
+      newCantidad++;
+    } else if (type === 'decrease') {
+      newCantidad--;
+    }
+  
     if (newCantidad < 1) return;
-
+  
     try {
       const formData = new FormData();
-      formData.append('idDetalle', item.id);
-      formData.append('cantidad', newCantidad);
-
+      formData.append('idDetalle', item.id_detalle_reserva.toString());
+      formData.append('cantidadProducto', newCantidad.toString());
+  
       const response = await fetch(`${ip}/fontechpriv/api/services/public/pedido.php?action=updateDetail`, {
         method: 'POST',
         body: formData,
       });
-
+  
       const data = await response.json();
-
-      if (data.status) {
-        const updatedCarrito = carrito.map(producto =>
-          producto.id === item.id ? { ...producto, CANTIDAD: newCantidad } : producto
-        );
-        setCarrito(updatedCarrito);
+  
+      if (data.status === 1) {
+        // Actualización exitosa, actualizar estado del carrito
+        setCarrito(prevCarrito => (
+          prevCarrito.map(producto =>
+            producto.id_detalle_reserva === item.id_detalle_reserva ? { ...producto, cantidad: newCantidad } : producto
+          )
+        ));
+        Alert.alert('Éxito', data.message);
       } else {
-        Alert.alert('Error', data.message);
+        // Manejo de errores
+        Alert.alert('Error', data.error || 'Ocurrió un problema al actualizar la cantidad del producto');
       }
     } catch (error) {
       Alert.alert('Error', 'Ocurrió un error al actualizar la cantidad del producto');
+      console.error(error);
     }
   };
+  
 
   // Función para eliminar un producto del carrito
   const handleDelete = async (idDetalle) => {
@@ -76,8 +89,14 @@ const CarritoScreen = ({ navigation }) => {
 
       if (data.status === 1) {
         // Eliminación exitosa, actualizar estado del carrito
-        setCarrito(prevCarrito => prevCarrito.filter(producto => producto.id !== idDetalle));
+        const updatedCarrito = carrito.filter(producto => producto.id !== idDetalle);
+        setCarrito(updatedCarrito);
         Alert.alert('Éxito', data.message);
+
+        // Verificar si el carrito está vacío y realizar acciones correspondientes
+        if (updatedCarrito.length === 0) {
+          // Puedes navegar a otra pantalla o realizar alguna acción
+        }
       } else {
         // Manejo de errores
         Alert.alert('Error', data.error || 'Ocurrió un problema al eliminar el producto');
@@ -139,7 +158,7 @@ const CarritoScreen = ({ navigation }) => {
         <Text style={styles.ofertaTitle}>{item.nombre_producto}</Text>
         <Text style={styles.ofertaPrice}>Precio Unitario: ${item.precio_unitario}</Text>
         {item.valor_oferta && (
-          <Text style={styles.ofertaPrice}>Oferta: ${item.valor_oferta}</Text>
+          <Text style={styles.ofertaPrice}>Oferta: %{item.valor_oferta}</Text>
         )}
         <View style={styles.quantityContainer}>
           <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange(item, 'decrease')}>
@@ -158,11 +177,31 @@ const CarritoScreen = ({ navigation }) => {
   );
 
   // Función para manejar la acción de finalizar la compra
-  const finalizarCompra = () => {
-    // Aquí puedes añadir la lógica para finalizar la compra
-    Alert.alert('Compra Finalizada', '¡Gracias por tu compra!');
-    // Puedes redirigir a otra pantalla o realizar cualquier otra acción necesaria
+  const finalizarCompra = async () => {
+    try {
+      const response = await fetch(`${ip}/fontechpriv/api/services/public/pedido.php?action=finishOrder`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.status === 1) {
+        // Pedido finalizado correctamente
+        Alert.alert('Compra Finalizada', '¡Gracias por tu compra!');
+        // Limpia el carrito y realiza cualquier otra acción necesaria
+        setCarrito([]); // Limpia el carrito después de finalizar la compra
+      } else {
+        Alert.alert('Error', data.error || 'Ocurrió un problema al finalizar el pedido');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Ocurrió un error al finalizar la compra');
+      console.error(error);
+    }
   };
+
 
   // Pantalla de carga mientras se obtienen los datos del carrito
   if (loading) {
