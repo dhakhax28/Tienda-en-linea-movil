@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, Image } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import styles from '../estilos/DashboardScreenStyles';
+import * as Constantes from '../utils/constantes';
 
 const DashboardScreen = ({ navigation }) => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const ip = Constantes.IP;
+
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
@@ -15,8 +17,27 @@ const DashboardScreen = ({ navigation }) => {
     return () => clearInterval(intervalId);
   }, []);
 
-  const handleLogout = () => {
-    navigation.navigate('Login');
+  const handleLogout = async () => {
+    try {
+      const url = `${ip}/fontechpriv/api/services/public/cliente.php?action=logOut`;
+      console.log('URL solicitada:', url); // Verifica la URL en la consola
+
+      const response = await fetch(url, {
+        method: 'GET',
+      });
+
+      const data = await response.json();
+
+      if (data.status) {
+        Alert.alert('Sesión cerrada exitosamente');
+        navigation.navigate('Login');
+      } else {
+        Alert.alert('Error', data.error);
+      }
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+      Alert.alert('Error', 'Ocurrió un error al cerrar sesión');
+    }
   };
 
   const categories = [
@@ -69,6 +90,7 @@ const DashboardScreen = ({ navigation }) => {
         ))}
       </View>
 
+      {/* Icono de cerrar sesión */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Ionicons name="lock-closed" size={24} color="black" />
       </TouchableOpacity>
