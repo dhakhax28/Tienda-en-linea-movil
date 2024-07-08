@@ -64,6 +64,7 @@ const CarritoScreen = ({ navigation }) => {
   const handleDelete = async (idDetalle) => {
     try {
       const formData = new FormData();
+      console.log(idDetalle);
       formData.append('idDetalle', idDetalle); // Asegúrate de enviarlo como número, no como cadena
 
       const response = await fetch(`${ip}/fontechpriv/api/services/public/pedido.php?action=deleteDetail`, {
@@ -131,7 +132,7 @@ const CarritoScreen = ({ navigation }) => {
   const renderOfertaItem = ({ item }) => (
     <TouchableOpacity
       style={styles.ofertaCard}
-      onPress={() => navigation.navigate('DetallesProducto', { idProducto: item.id })}
+      onPress={() => navigation.navigate('DetallesProducto', { idProducto: item.id_detalle_reserva })}
     >
       <Image source={{ uri: `${ip}/fontechpriv/api/images/productos/${item.imagen}` }} style={styles.ofertaImage} />
       <View style={styles.ofertaDetails}>
@@ -148,7 +149,7 @@ const CarritoScreen = ({ navigation }) => {
           <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange(item, 'increase')}>
             <Text style={styles.quantityButtonText}>+</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id)}>
+          <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id_detalle_reserva)}>
             <Text style={{ color: '#fff', fontWeight: 'bold' }}>Eliminar</Text>
           </TouchableOpacity>
         </View>
