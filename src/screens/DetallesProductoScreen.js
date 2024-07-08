@@ -68,7 +68,11 @@ const DetallesProductoScreen = () => {
 
       if (data.status) {
         Alert.alert('Éxito', 'Producto añadido al carrito');
-        navigation.navigate('Carrito', { idProducto, cantidadProducto: cantidadNumerica });
+        navigation.navigate('DashboardTabs', {
+          screen: 'Carrito',
+          params: { idProducto, cantidadProducto: cantidadNumerica }
+        });
+        
       } else {
         Alert.alert('Error', data.message);
       }
