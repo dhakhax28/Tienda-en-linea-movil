@@ -1,25 +1,24 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Alert, ActivityIndicator, RefreshControl } from 'react-native';
-import styles from '../estilos/CarritoScreenStyles';  // Importa los estilos desde un archivo externo
+import { View, Text, FlatList, TouchableOpacity, Alert, ActivityIndicator, RefreshControl, Image } from 'react-native';
+import styles from '../estilos/CarritoScreenStyles'; // Importa los estilos desde un archivo externo
 import * as Constantes from '../utils/constantes';
 
-const CarritoScreen = ({ navigation, route }) => {
+const CarritoScreen = ({ navigation }) => {
   const [carrito, setCarrito] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false); // Estado para controlar el estado de refrescar
+  const [subtotal, setSubtotal] = useState(0); // Estado para almacenar el subtotal
+  const [descuento, setDescuento] = useState(0); // Estado para almacenar el descuento
 
   const ip = Constantes.IP;
 
   // Función para obtener los detalles del carrito desde la API
-  const fetchCarrito = async () => {
+  const fetchCarrito = useCallback(async () => {
     try {
       const response = await fetch(`${ip}/fontechpriv/api/services/public/pedido.php?action=readDetail`);
       const data = await response.json();
       if (data.status) {
         setCarrito(data.dataset);
-        if (data.dataset.length === 0) {
-          Alert.alert('Carrito vacío', 'No hay productos en el carrito.');
-        }
       } else {
         Alert.alert('Error', data.error);
       }
@@ -29,16 +28,19 @@ const CarritoScreen = ({ navigation, route }) => {
       setLoading(false);
       setRefreshing(false); // Finaliza el estado de refrescar
     }
-  };
+  }, [ip]);
 
-  // Función para agregar un producto al carrito
-  const addProductToCarrito = async (idProducto, cantidadProducto) => {
+  // Función para manejar el cambio de cantidad de un producto en el carrito
+  const handleQuantityChange = async (item, type) => {
+    const newCantidad = type === 'increase' ? item.CANTIDAD + 1 : item.CANTIDAD - 1;
+    if (newCantidad < 1) return;
+
     try {
       const formData = new FormData();
-      formData.append('idProducto', idProducto);
-      formData.append('cantidadProducto', cantidadProducto);
+      formData.append('idDetalle', item.id);
+      formData.append('cantidad', newCantidad);
 
-      const response = await fetch(`${ip}/fontechpriv/api/services/public/pedido.php?action=createDetail`, {
+      const response = await fetch(`${ip}/fontechpriv/api/services/public/pedido.php?action=updateDetail`, {
         method: 'POST',
         body: formData,
       });
@@ -46,77 +48,42 @@ const CarritoScreen = ({ navigation, route }) => {
       const data = await response.json();
 
       if (data.status) {
-        // Si el producto se agregó correctamente, actualizar el estado del carrito
-        const productoExistente = carrito.find(item => item.id === idProducto);
-        if (productoExistente) {
-          const updatedCarrito = carrito.map(item =>
-            item.id === idProducto ? { ...item, CANTIDAD: item.CANTIDAD + parseInt(cantidadProducto) } : item
-          );
-          setCarrito(updatedCarrito);
-        } else {
-          const nuevoProducto = {
-            id: idProducto,
-            PRODUCTO: data.dataset.nombre_producto,
-            'PRECIO (US$)': parseFloat(data.dataset.precio),
-            CANTIDAD: parseInt(cantidadProducto),
-            Oferta: data.dataset.oferta,
-          };
-          setCarrito([...carrito, nuevoProducto]);
-        }
+        const updatedCarrito = carrito.map(producto =>
+          producto.id === item.id ? { ...producto, CANTIDAD: newCantidad } : producto
+        );
+        setCarrito(updatedCarrito);
       } else {
         Alert.alert('Error', data.message);
       }
     } catch (error) {
-      Alert.alert('Error', 'Ocurrió un error al agregar el producto al carrito');
+      Alert.alert('Error', 'Ocurrió un error al actualizar la cantidad del producto');
     }
   };
 
-  // Función para manejar el cambio de cantidad de un producto en el carrito
-  const handleQuantityChange = (item, type) => {
-    const updatedCarrito = carrito.map(producto => {
-      if (producto.id === item.id) {
-        let newCantidad = producto.CANTIDAD;
-        if (type === 'increase') {
-          newCantidad++;
-        } else if (type === 'decrease' && newCantidad > 1) {
-          newCantidad--;
-        }
-        return { ...producto, CANTIDAD: newCantidad };
-      }
-      return producto;
-    });
-    setCarrito(updatedCarrito);
-  };
-
-  // Función para realizar la compra de un producto del carrito
-  const handleBuy = async (item) => {
+  // Función para eliminar un producto del carrito
+  const handleDelete = async (idDetalle) => {
     try {
       const formData = new FormData();
-      formData.append('idDetalle', item.id);
-      
-      const response = await fetch(`${ip}/fontechpriv/api/services/public/pedido.php?action=finishOrder`, {
+      formData.append('idDetalle', idDetalle); // Asegúrate de enviarlo como número, no como cadena
+
+      const response = await fetch(`${ip}/fontechpriv/api/services/public/pedido.php?action=deleteDetail`, {
         method: 'POST',
         body: formData,
       });
 
       const data = await response.json();
 
-      if (data.status) {
-        Alert.alert(
-          'Compra realizada',
-          `Has comprado ${item.PRODUCTO} (Cantidad: ${item.CANTIDAD}) por $${(item['PRECIO (US$)'] * item.CANTIDAD).toFixed(2)}`,
-          [
-            { text: 'OK', onPress: () => console.log('Alerta cerrada') }
-          ]
-        );
-        // Actualizar el carrito después de finalizar la compra
-        const updatedCarrito = carrito.filter(producto => producto.id !== item.id);
-        setCarrito(updatedCarrito);
+      if (data.status === 1) {
+        // Eliminación exitosa, actualizar estado del carrito
+        setCarrito(prevCarrito => prevCarrito.filter(producto => producto.id !== idDetalle));
+        Alert.alert('Éxito', data.message);
       } else {
-        Alert.alert('Error', data.error);
+        // Manejo de errores
+        Alert.alert('Error', data.error || 'Ocurrió un problema al eliminar el producto');
       }
     } catch (error) {
-      Alert.alert('Error', 'Ocurrió un error al finalizar la compra');
+      Alert.alert('Error', 'Ocurrió un error al eliminar el producto del carrito');
+      console.error(error);
     }
   };
 
@@ -124,18 +91,41 @@ const CarritoScreen = ({ navigation, route }) => {
   const onRefresh = useCallback(() => {
     setRefreshing(true); // Establece el estado de refrescar a verdadero
     fetchCarrito(); // Vuelve a cargar los datos del carrito desde la API
-  }, []);
+  }, [fetchCarrito]);
 
-  // Efecto para cargar los detalles del carrito al cargar la pantalla o al recibir nuevos parámetros
+  // Efecto para cargar los detalles del carrito al cargar la pantalla
   useEffect(() => {
     fetchCarrito();
+  }, [fetchCarrito]);
 
-    // Verifica si hay parámetros recibidos al cargar la pantalla
-    if (route.params) {
-      const { idProducto, cantidadProducto } = route.params;
-      addProductToCarrito(idProducto, cantidadProducto); // Llama a la función para agregar el producto al carrito
-    }
-  }, [route.params]);
+  // Efecto para calcular el subtotal y aplicar descuentos cada vez que el carrito cambie
+  useEffect(() => {
+    const calcularSubtotal = () => {
+      let total = 0;
+      let descuentoTotal = 0;
+
+      carrito.forEach(item => {
+        // Calcular subtotal por producto
+        const subtotalProducto = item.precio_unitario * item.cantidad;
+
+        // Verificar si el producto tiene descuento
+        if (item.valor_oferta) {
+          // Calcular subtotal aplicando descuento
+          const subtotalConDescuento = subtotalProducto - (subtotalProducto * item.valor_oferta) / 100;
+          total += subtotalConDescuento;
+          descuentoTotal += subtotalProducto - subtotalConDescuento; // Calcular el descuento aplicado
+        } else {
+          // Si no tiene descuento, agregar al subtotal normal
+          total += subtotalProducto;
+        }
+      });
+
+      setSubtotal(total);
+      setDescuento(descuentoTotal);
+    };
+
+    calcularSubtotal();
+  }, [carrito]);
 
   // Renderizar cada elemento del carrito
   const renderOfertaItem = ({ item }) => (
@@ -143,11 +133,13 @@ const CarritoScreen = ({ navigation, route }) => {
       style={styles.ofertaCard}
       onPress={() => navigation.navigate('DetallesProducto', { idProducto: item.id })}
     >
+      <Image source={{ uri: `${ip}/fontechpriv/api/images/productos/${item.imagen}` }} style={styles.ofertaImage} />
       <View style={styles.ofertaDetails}>
         <Text style={styles.ofertaTitle}>{item.nombre_producto}</Text>
         <Text style={styles.ofertaPrice}>Precio Unitario: ${item.precio_unitario}</Text>
-        
+        {item.valor_oferta && (
           <Text style={styles.ofertaPrice}>Oferta: ${item.valor_oferta}</Text>
+        )}
         <View style={styles.quantityContainer}>
           <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange(item, 'decrease')}>
             <Text style={styles.quantityButtonText}>-</Text>
@@ -156,13 +148,20 @@ const CarritoScreen = ({ navigation, route }) => {
           <TouchableOpacity style={styles.quantityButton} onPress={() => handleQuantityChange(item, 'increase')}>
             <Text style={styles.quantityButtonText}>+</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.boton} onPress={() => handleBuy(item)}>
-            <Text style={{ color: '#fff', fontWeight: 'bold' }}>Comprar</Text>
+          <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item.id)}>
+            <Text style={{ color: '#fff', fontWeight: 'bold' }}>Eliminar</Text>
           </TouchableOpacity>
         </View>
       </View>
     </TouchableOpacity>
   );
+
+  // Función para manejar la acción de finalizar la compra
+  const finalizarCompra = () => {
+    // Aquí puedes añadir la lógica para finalizar la compra
+    Alert.alert('Compra Finalizada', '¡Gracias por tu compra!');
+    // Puedes redirigir a otra pantalla o realizar cualquier otra acción necesaria
+  };
 
   // Pantalla de carga mientras se obtienen los datos del carrito
   if (loading) {
@@ -191,6 +190,16 @@ const CarritoScreen = ({ navigation, route }) => {
           />
         }
       />
+      {carrito.length === 0 && (
+        <Text style={styles.emptyCarritoText}>No hay productos en el carrito.</Text>
+      )}
+      <View style={styles.subtotalContainer}>
+        <Text style={styles.subtotalText}>Subtotal: ${subtotal.toFixed(2)}</Text>
+      </View>
+      <TouchableOpacity style={styles.finalizarCompraButton} onPress={finalizarCompra}>
+        <Text style={{ color: '#fff', fontWeight: 'bold' }}>Finalizar compra</Text>
+      </TouchableOpacity>
+      <View style={{ height: 20 }} />
     </View>
   );
 };

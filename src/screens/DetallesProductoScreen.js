@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ActivityIndicator, RefreshControl, TextInput, ScrollView } from 'react-native'; // Asegúrate de importar ScrollView de 'react-native'
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ActivityIndicator, RefreshControl, TextInput, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRoute, useNavigation } from '@react-navigation/native';
-import styles from '../estilos/DetallesProductosScreen'; // Importa los estilos desde un archivo externo
+import styles from '../estilos/DetallesProductosScreen';
 import * as Constantes from '../utils/constantes';
 
 const DetallesProductoScreen = () => {
@@ -12,11 +12,10 @@ const DetallesProductoScreen = () => {
   const [producto, setProducto] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [cantidadProducto, setCantidadProducto] = useState(''); // Inicializar con una cadena vacía para que el campo esté vacío inicialmente
+  const [cantidadProducto, setCantidadProducto] = useState('');
 
   const ip = Constantes.IP;
 
-  // Función para obtener los detalles del producto desde la API
   const fetchProducto = async () => {
     try {
       const formData = new FormData();
@@ -39,7 +38,6 @@ const DetallesProductoScreen = () => {
     }
   };
 
-  // Función para refrescar la pantalla
   const refreshScreen = () => {
     setRefreshing(true);
     fetchProducto();
@@ -49,7 +47,6 @@ const DetallesProductoScreen = () => {
     fetchProducto();
   }, []);
 
-  // Función para agregar el producto al carrito
   const agregarAlCarrito = async () => {
     const cantidadNumerica = parseInt(cantidadProducto, 10);
     if (isNaN(cantidadNumerica) || cantidadNumerica <= 0) {
