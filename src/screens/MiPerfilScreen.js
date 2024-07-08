@@ -8,8 +8,9 @@ const MiPerfilScreen = () => {
   const ip = Constantes.IP;
 
   // Estados para los datos del perfil
+  // Estados para los datos del perfil
   const [nombre, setNombre] = useState('');
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(''); // Debe corresponder a aliaCliente en PHP
   const [correo, setCorreo] = useState('');
   const [direccion, setDireccion] = useState('');
   const [loading, setLoading] = useState(true);
@@ -20,6 +21,7 @@ const MiPerfilScreen = () => {
     longitudeDelta: 0.1,
   });
   const [editando, setEditando] = useState(false); // Estado para controlar la edición
+  // Estado para controlar la edición
 
   // Referencias para los TextInput
   const nombreRef = useRef(null);
@@ -80,12 +82,13 @@ const MiPerfilScreen = () => {
   };
 
   // Función para manejar la actualización de los datos del perfil
+  // Función para manejar la actualización de los datos del perfil
   const handleUpdate = async () => {
     try {
       const formData = new FormData();
-      formData.append('nombre', nombre);
-      formData.append('correo', correo);
-      formData.append('username', username);
+      formData.append('nombreCliente', nombre);
+      formData.append('correoCliente', correo);
+      formData.append('aliaCliente', username); // username en React Native corresponde a aliaCliente en PHP
 
       const url = `${ip}/fontechpriv/api/services/public/cliente.php?action=editProfile`;
 
@@ -105,6 +108,7 @@ const MiPerfilScreen = () => {
       Alert.alert('Error', 'Ocurrió un error al actualizar el perfil');
     }
   };
+
 
   // Función para manejar la cancelación y limpiar los campos
   const handleDelete = () => {
