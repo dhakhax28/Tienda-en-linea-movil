@@ -8,6 +8,7 @@ const LoginScreen = ({ navigation }) => {
   const ip = Constantes.IP;
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // Estado para controlar la visibilidad de la contraseña
   const animatedValue = new Animated.Value(0);
 
   useEffect(() => {
@@ -88,6 +89,8 @@ const LoginScreen = ({ navigation }) => {
         const data = JSON.parse(responseText); // Intenta parsear la respuesta como JSON
         if (data.status) {
           Alert.alert("Sesión finalizada");
+          setUsername(''); // Limpiar el estado de usuario al cerrar sesión
+          setPassword(''); // Limpiar el estado de contraseña al cerrar sesión
           // Aquí podrías agregar cualquier otra lógica necesaria al cerrar sesión, como limpiar el estado de usuario, etc.
         } else {
           Alert.alert('Error', data.error);
@@ -139,8 +142,16 @@ const LoginScreen = ({ navigation }) => {
         placeholder="Contraseña"
         onChangeText={text => setPassword(text)}
         value={password}
-        secureTextEntry={true}
+        secureTextEntry={!showPassword} // Controla la visibilidad de la contraseña
       />
+      <TouchableOpacity style={styles.iconButton} onPress={() => setShowPassword(!showPassword)}>
+        <Icon
+          name={showPassword ? 'eye-off' : 'eye'}
+          type='ionicon'
+          color='#517fa4'
+          size={20}
+        />
+      </TouchableOpacity>
       <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <Text style={styles.buttonText}>Iniciar sesión</Text>
       </TouchableOpacity>
@@ -149,9 +160,6 @@ const LoginScreen = ({ navigation }) => {
       </TouchableOpacity>
       <TouchableOpacity onPress={handleForgotPasswordRedirect}>
         <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Icon name="lock-closed" type="ionicon" size={24} color="black" />
       </TouchableOpacity>
     </View>
   );
