@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
 import styles from '../estilos/DashboardScreenStyles';
 import * as Constantes from '../utils/constantes';
+import Cards1 from '../Componets/Cards/Cards1';
+import { Ionicons } from '@expo/vector-icons';
 
 const DashboardScreen = ({ navigation }) => {
   const ip = Constantes.IP;
@@ -19,21 +20,7 @@ const DashboardScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     try {
-      const url = `${ip}/fontechpriv/api/services/public/cliente.php?action=logOut`;
-      console.log('URL solicitada:', url); // Verifica la URL en la consola
-
-      const response = await fetch(url, {
-        method: 'GET',
-      });
-
-      const data = await response.json();
-
-      if (data.status) {
-        Alert.alert('Sesión cerrada exitosamente');
-        navigation.navigate('Login');
-      } else {
-        Alert.alert('Error', data.error);
-      }
+      navigation.navigate('Login');
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
       Alert.alert('Error', 'Ocurrió un error al cerrar sesión');
@@ -41,9 +28,9 @@ const DashboardScreen = ({ navigation }) => {
   };
 
   const categories = [
-    { title: 'Categorías', icon: 'grid-outline' },
-    { title: 'Ofertas', icon: 'gift-outline' },
-    { title: 'Historial', icon: 'time-outline' }
+    { title: 'Categorías', icon: 'grid-outline', navigateTo: 'Categorias' },
+    { title: 'Ofertas', icon: 'gift-outline', navigateTo: 'Ofertas' },
+    { title: 'Historial', icon: 'time-outline', navigateTo: 'Historial' },
   ];
 
   const images = [
@@ -56,12 +43,9 @@ const DashboardScreen = ({ navigation }) => {
   return (
     <ScrollView
       contentContainerStyle={styles.container}
-      // Deshabilita los gestos de retroceso en dispositivos Android
-      // Solo afecta a este componente específico
       gestureEnabled={false}
       gestureDirection="horizontal"
     >
-
       <Image
         source={{ uri: images[currentImageIndex] }}
         style={styles.banner}
@@ -71,26 +55,15 @@ const DashboardScreen = ({ navigation }) => {
 
       <View style={styles.grid}>
         {categories.map((category, index) => (
-          <TouchableOpacity
+          <Cards1
             key={index}
-            style={styles.card}
-            onPress={() => {
-              if (category.title === 'Categorías') {
-                navigation.navigate('Categorias');
-              } else if (category.title === 'Ofertas') {
-                navigation.navigate('Ofertas');
-              } else if (category.title === 'Historial') {
-                navigation.navigate('Historial');
-              }
-            }}
-          >
-            <Ionicons name={category.icon} size={40} color="#000" />
-            <Text style={styles.cardTitle}>{category.title}</Text>
-          </TouchableOpacity>
+            title={category.title}
+            icon={category.icon}
+            onPress={() => navigation.navigate(category.navigateTo)}
+          />
         ))}
       </View>
 
-      {/* Icono de cerrar sesión */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
         <Ionicons name="lock-closed" size={24} color="black" />
       </TouchableOpacity>
