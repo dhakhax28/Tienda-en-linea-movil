@@ -13,6 +13,8 @@ import DashboardScreen from './src/screens/DashboardScreen';
 import CategoriaScreen from './src/screens/CategoriaScreen';
 import PerfilScreen from './src/screens/PerfilScreen';
 import MiPerfilScreen from './src/screens/MiPerfilScreen';
+import PinVerificationScreen from './src/screens/PinVerificationScreen';
+import NewPasswordScreen from './src/screens/NewPasswordScreen';
 import CarritoScreen from './src/screens/CarritoScreen';
 import HistorialScreen from './src/screens/HistorialScreen';
 import ProductoScreen from './src/screens/ProductoScreen';
@@ -87,7 +89,6 @@ export default function App() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="PasswordRecovery" component={PasswordRecoveryScreen} />
         <Stack.Screen name="DashboardTabs" component={DashboardTabNavigator} />
         <Stack.Screen name="Perfil" component={PerfilScreen} />
         <Stack.Screen name="MiPerfil" component={MiPerfilScreen} />
@@ -95,6 +96,9 @@ export default function App() {
         <Stack.Screen name="Carrito" component={CarritoScreen} />
         <Stack.Screen name="Historial" component={HistorialScreen} />
         <Stack.Screen name="Ofertas" component={OfertasScreen} />
+        <Stack.Screen name="PasswordRecovery" component={PasswordRecoveryScreen} />
+        <Stack.Screen name="PinVerificationScreen" component={PinVerificationScreen} />
+        <Stack.Screen name="NewPassword" component={NewPasswordScreen} />
         <Stack.Screen name="TerminosyCondiciones" component={TerminosCondicionesScreen} />
         <Stack.Screen name="DetallesProducto" component={DetallesProductoScreen} />
       </Stack.Navigator>
