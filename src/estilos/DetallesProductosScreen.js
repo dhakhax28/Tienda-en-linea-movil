@@ -198,6 +198,25 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     flexGrow: 100, // Permite que el contenido dentro del ScrollView se expanda
   },
+  submitButtonText: {
+    color: '#000000',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  commentsList: {
+    padding: 16,
+  },
+  commentItem: {
+    marginBottom: 16,
+    padding: 10,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: '#fff',
+  },
+  commentText: {
+    fontSize: 16,
+  },
   
 });
 

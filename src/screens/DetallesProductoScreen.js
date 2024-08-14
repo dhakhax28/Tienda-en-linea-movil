@@ -40,14 +40,71 @@ const DetallesProductoScreen = () => {
       setRefreshing(false);
     }
   };
+  const handleHabilitado= async () => {
+    try {
+      const formData = new FormData();
+      formData.append('idProducto1', idProducto);
+      
+      const url = `${ip}/fontechpriv/api/services/public/comentario.php?action=verifComent`;
+      console.log('URL solicitada:', url); // Para verificar la URL
+
+      const response = await fetch(url, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const responseText = await response.text(); // Obtén la respuesta como texto
+
+      try {
+        const data = JSON.parse(responseText); // Intenta parsear la respuesta como JSON
+        if (data.status) {
+          habilitado=false;
+        } else {
+          habilitado=true;
+        }
+      } catch (jsonError) {
+        console.error('Error al parsear JSON:', jsonError);
+        console.error('Respuesta recibida:', responseText);
+        Alert.alert('Error', 'Ocurrió un error al procesar la respuesta del servidor');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Ocurrió un error al iniciar sesión');
+    }
+  };
+
+  const fetchComentarios = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('idProducto1', idProducto);
+      const response = await fetch(`${ip}/fontechpriv/api/services/public/comentario.php?action=readAllByProducto`, {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await response.json();
+      if (data.status) {
+        setComentarios(data.dataset);
+      } else {
+        Alert.alert('Error', data.message);
+      }
+    } catch (error) {
+      Alert.alert('Error', 'Ocurrió un error al obtener los comentarios');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
   const refreshScreen = () => {
     setRefreshing(true);
     fetchProducto();
+    fetchComentarios();
+    handleHabilitado();
   };
 
   useEffect(() => {
     fetchProducto();
+    fetchComentarios();
+    handleHabilitado();
   }, []);
 
   const agregarAlCarrito = async () => {
@@ -89,7 +146,10 @@ const DetallesProductoScreen = () => {
 
   const handleAddComment = () => {
     if (comentario.trim()) {
-      setComentarios([...comentarios, comentario]);
+      // Combina la valoración y el comentario
+      const newComment = { rating, comentario };
+      setComentarios([...comentarios, newComment]);
+      setRating(0); // Limpia la calificación
       setComentario(''); // Limpia el campo de comentario después de agregar
     } else {
       Alert.alert('Error', 'El comentario no puede estar vacío');
@@ -111,6 +171,30 @@ const DetallesProductoScreen = () => {
       </View>
     );
   }
+
+  const handleComentario = async () => {
+
+    try {
+      const formData = new FormData();
+      formData.append('floatingTextarea2', comentario);
+      formData.append('starValue', rating);
+      formData.append('idProducto1', idProducto);
+
+      const response = await fetch(`${ip}/fontechpriv/api/services/public/comentario.php?action=createComentario`, {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+      if (data.status) {
+        Alert.alert('Comentario creado correctamente');
+      } else {
+        Alert.alert(`Error: ${data.error}`);
+      }
+    } catch (error) {
+      Alert.alert('Ocurrió un error al intentar crear el comentario');
+    }
+  };
 
   return (
     <ScrollView 
@@ -218,17 +302,21 @@ const DetallesProductoScreen = () => {
           placeholder="Escribe tu comentario aquí..."
           value={comentario}
           onChangeText={setComentario}
+          multiline
         />
-        <TouchableOpacity style={styles.addCommentButton} onPress={handleAddComment}>
-          <Text style={styles.addCommentButtonText}>Añadir Comentario</Text>
+        <TouchableOpacity style={styles.submitButton} onPress={handleComentario}>
+          <Text style={styles.submitButtonText}>Agregar Comentario</Text>
         </TouchableOpacity>
-        <View style={styles.commentsList}>
-          {comentarios.map((comentario, index) => (
-            <Text key={index} style={styles.commentText}>
-              {comentario}
-            </Text>
-          ))}
-        </View>
+      </View>
+
+      {/* Mostrar comentarios */}
+      <View style={styles.commentsList}>
+        {comentarios.map((item, index) => (
+          <View key={index} style={styles.commentItem}>
+            <Text style={styles.commentText}>Valoración: {item.calificacion_valoracion} estrellas</Text>
+            <Text style={styles.commentText}>Comentario: {item.comentario_valoracion}</Text>
+          </View>
+        ))}
       </View>
     </ScrollView>
   );
