@@ -13,6 +13,9 @@ const DetallesProductoScreen = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [cantidadProducto, setCantidadProducto] = useState('');
+  const [rating, setRating] = useState(0); // Estado para la calificación
+  const [comentario, setComentario] = useState(''); // Estado para el comentario
+  const [comentarios, setComentarios] = useState([]); // Estado para lista de comentarios
 
   const ip = Constantes.IP;
 
@@ -72,12 +75,24 @@ const DetallesProductoScreen = () => {
           idProducto, 
           cantidadProducto: cantidadNumerica
         });
-        
       } else {
         Alert.alert('Error', data.message);
       }
     } catch (error) {
       Alert.alert('Error', 'Ocurrió un error al agregar el producto al carrito');
+    }
+  };
+
+  const handleRatingPress = (star) => {
+    setRating(star); // Actualiza la calificación según la estrella clickeada
+  };
+
+  const handleAddComment = () => {
+    if (comentario.trim()) {
+      setComentarios([...comentarios, comentario]);
+      setComentario(''); // Limpia el campo de comentario después de agregar
+    } else {
+      Alert.alert('Error', 'El comentario no puede estar vacío');
     }
   };
 
@@ -98,13 +113,15 @@ const DetallesProductoScreen = () => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <ScrollView
-        contentContainerStyle={styles.scrollViewContent}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={refreshScreen} />
-        }
-      ></ScrollView>
+    <ScrollView 
+      contentContainerStyle={styles.scrollViewContent}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={refreshScreen}
+        />
+      }
+    >
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="arrow-back" size={24} color="#000" />
       </TouchableOpacity>
@@ -172,9 +189,47 @@ const DetallesProductoScreen = () => {
           />
         </View>
       </View>
+
       <TouchableOpacity style={styles.addButton} onPress={agregarAlCarrito}>
         <Text style={styles.addButtonText}>Añadir al carrito</Text>
       </TouchableOpacity>
+
+      {/* Apartado de valoración */}
+      <View style={styles.ratingContainer}>
+        <Text style={styles.ratingLabel}>Valoración:</Text>
+        <View style={styles.starsContainer}>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <TouchableOpacity key={star} onPress={() => handleRatingPress(star)}>
+              <Ionicons
+                name={star <= rating ? "star" : "star-outline"}
+                size={24}
+                color="#FFD700"
+              />
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      {/* Apartado de comentarios */}
+      <View style={styles.commentsContainer}>
+        <Text style={styles.commentsLabel}>Comentario:</Text>
+        <TextInput
+          style={styles.commentsInput}
+          placeholder="Escribe tu comentario aquí..."
+          value={comentario}
+          onChangeText={setComentario}
+        />
+        <TouchableOpacity style={styles.addCommentButton} onPress={handleAddComment}>
+          <Text style={styles.addCommentButtonText}>Añadir Comentario</Text>
+        </TouchableOpacity>
+        <View style={styles.commentsList}>
+          {comentarios.map((comentario, index) => (
+            <Text key={index} style={styles.commentText}>
+              {comentario}
+            </Text>
+          ))}
+        </View>
+      </View>
     </ScrollView>
   );
 };
