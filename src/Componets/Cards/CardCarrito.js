@@ -6,7 +6,7 @@ import * as Constantes from '../../utils/constantes';
 const ip = Constantes.IP; // Define la URL base aquí, asegúrate de reemplazar 'your-server-ip' con la IP correcta
 
 const CardCarrito = ({ item, onIncrease, onDecrease, onDelete }) => {
-  const imageUrl = `${ip}/Expo_Comodo/api/images/productos/${item.imagen}`;
+  const imageUrl = `${ip}/FontechPriv/api/images/productos/${item.imagen}`;
 
   return (
     <TouchableOpacity style={styles.ofertaCard}>

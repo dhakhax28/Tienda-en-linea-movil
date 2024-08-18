@@ -11,7 +11,7 @@ const CardOferta = ({ oferta, onPress }) => (
     style={styles.ofertaCard}
     onPress={onPress}
   >
-    <Image source={{ uri: `${ip}/Expo_Comodo/api/images/productos/${oferta.imagen}` }} style={styles.ofertaImage} />
+    <Image source={{ url: `${ip}/FontechPriv/api/images/productos/${oferta.imagen}` }} style={styles.ofertaImage} />
     <View style={styles.ofertaDetails}>
       <Text style={styles.ofertaTitle}>{oferta.nombre_producto}</Text>
       <Text style={styles.ofertaDescription}>{oferta.nombre_genero}</Text>
