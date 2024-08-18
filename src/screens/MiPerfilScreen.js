@@ -1,38 +1,38 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Alert, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, TextInput, Image, TouchableOpacity, Alert, ActivityIndicator, ScrollView, RefreshControl } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import styles from '../estilos/MiPerfilScreenStyles';
+import styles from '../estilos/MiPerfilScreenStyles'; // Asegúrate de que este archivo esté correcto
 import * as Constantes from '../utils/constantes';
 
 const MiPerfilScreen = () => {
   const ip = Constantes.IP;
 
   // Estados para los datos del perfil
-  // Estados para los datos del perfil
   const [nombre, setNombre] = useState('');
-  const [username, setUsername] = useState(''); // Debe corresponder a aliaCliente en PHP
+  const [username, setUsername] = useState('');
   const [correo, setCorreo] = useState('');
   const [direccion, setDireccion] = useState('');
   const [loading, setLoading] = useState(true);
   const [region, setRegion] = useState({
-    latitude: 13.6929, // Latitud de San Salvador por defecto
-    longitude: -89.2182, // Longitud de San Salvador por defecto
+    latitude: 13.6929,
+    longitude: -89.2182,
     latitudeDelta: 0.1,
     longitudeDelta: 0.1,
   });
-  const [editando, setEditando] = useState(false); // Estado para controlar la edición
-  // Estado para controlar la edición
+  const [editando, setEditando] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Referencias para los TextInput
   const nombreRef = useRef(null);
   const usernameRef = useRef(null);
   const correoRef = useRef(null);
   const direccionRef = useRef(null);
+  const telefonoRef = useRef(null);
 
   // Función para obtener y mostrar el perfil del usuario
   const fetchProfile = async () => {
     try {
-      const response = await fetch(`${ip}/fontechpriv/api/services/public/cliente.php?action=readProfile`);
+      const response = await fetch(`${ip}/FontechPriv/api/services/public/cliente.php?action=readProfile`);
       const data = await response.json();
 
       console.log('Perfil Data:', data);
@@ -41,12 +41,12 @@ const MiPerfilScreen = () => {
         setNombre(data.dataset.nombre);
         setUsername(data.dataset.usuario);
         setCorreo(data.dataset.correo);
-        setDireccion(data.dataset.direccion);
+        setDireccion(data.dataset.direccion_cliente);
 
         // Utiliza Nominatim para obtener las coordenadas reales de la dirección
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(data.dataset.direccion)}`;
-        const response = await fetch(url);
-        const geoData = await response.json();
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(data.dataset.direccion_cliente)}`;
+        const geoResponse = await fetch(url);
+        const geoData = await geoResponse.json();
 
         console.log('Geocode Data:', geoData);
 
@@ -78,37 +78,50 @@ const MiPerfilScreen = () => {
       Alert.alert('Error', 'Ocurrió un error al obtener el perfil');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
-  // Función para manejar la actualización de los datos del perfil
   // Función para manejar la actualización de los datos del perfil
   const handleUpdate = async () => {
     try {
+      // Crea un objeto con los datos del perfil
       const formData = new FormData();
-      formData.append('nombreCliente', nombre);
-      formData.append('correoCliente', correo);
-      formData.append('aliaCliente', username); // username en React Native corresponde a aliaCliente en PHP
+      formData.append('nombre', nombre);
+      formData.append('correo', correo);
+      formData.append('username', username);
+      formData.append('direccion', direccion);
 
-      const url = `${ip}/fontechpriv/api/services/public/cliente.php?action=editProfile`;
+      // URL de la API para actualizar el perfil
+      const url = `${ip}/Fontechriv/api/services/public/cliente.php?action=editProfile`;
 
+      // Realiza la solicitud POST para actualizar el perfil
       const response = await fetch(url, {
         method: 'POST',
         body: formData,
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
-      const data = await response.json();
+      const responseJson = await response.json();
+      console.log('API Response:', responseJson); // Imprime la respuesta JSON
 
-      if (data.status) {
+      // Manejo de la respuesta
+      if (responseJson.status === 1) {
         Alert.alert('Perfil actualizado', 'Los datos del perfil han sido actualizados exitosamente');
+        setEditando(false); // Desactiva el modo de edición
       } else {
-        Alert.alert('Error', 'No se pudo actualizar el perfil');
+        // Muestra un mensaje de error si el perfil no se pudo actualizar
+        Alert.alert('Error', responseJson.error || 'No se pudo actualizar el perfil');
       }
     } catch (error) {
+      // Muestra un mensaje de error en caso de que ocurra un problema
       Alert.alert('Error', 'Ocurrió un error al actualizar el perfil');
+      console.error('Error al actualizar el perfil:', error);
     }
   };
-
 
   // Función para manejar la cancelación y limpiar los campos
   const handleDelete = () => {
@@ -116,13 +129,56 @@ const MiPerfilScreen = () => {
     setUsername('');
     setCorreo('');
     setDireccion('');
+    setTelefono('');
 
     nombreRef.current.clear();
     usernameRef.current.clear();
     correoRef.current.clear();
     direccionRef.current.clear();
-    setEditando(false); // Asegura que el modo edición se desactive al cancelar
+    telefonoRef.current.clear();
+    setEditando(false);
     fetchProfile(); // Actualiza los datos del perfil al cancelar
+  };
+
+  // Función para obtener la dirección basada en las coordenadas
+  const reverseGeocode = async (lat, lon) => {
+    try {
+      const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      console.log('Reverse Geocode Data:', data);
+
+      if (data && data.address) {
+        const address = `${data.address.road || ''}, ${data.address.city || ''}, ${data.address.country || ''}`;
+        setDireccion(address);
+      } else {
+        Alert.alert('Error', 'No se encontró la dirección para esta ubicación');
+      }
+    } catch (error) {
+      console.error('Reverse Geocode Error:', error);
+      Alert.alert('Error', 'Ocurrió un error al obtener la dirección');
+    }
+  };
+
+  // Función para manejar el clic en el mapa para cambiar la ubicación
+  const handleMapPress = (e) => {
+    const { latitude, longitude } = e.nativeEvent.coordinate;
+    if (editando) {
+      const newRegion = {
+        latitude,
+        longitude,
+        latitudeDelta: 0.01,
+        longitudeDelta: 0.01,
+      };
+      setRegion(newRegion);
+      reverseGeocode(latitude, longitude); // Actualiza la dirección basada en las nuevas coordenadas
+    }
+  };
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchProfile();
   };
 
   useEffect(() => {
@@ -138,7 +194,12 @@ const MiPerfilScreen = () => {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+    <ScrollView
+      contentContainerStyle={styles.scrollViewContainer}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+      }
+    >
       <View style={styles.container}>
         <Text style={styles.title}>Datos Personales</Text>
 
@@ -186,57 +247,59 @@ const MiPerfilScreen = () => {
           />
         </View>
 
+        {/* Contenedor para el campo Teléfono */}
+        <View style={styles.inputContainer}>
+          <Text style={styles.label}>Teléfono</Text>
+          <TextInput
+            ref={telefonoRef}
+            style={styles.input}
+            onChangeText={setTelefono}
+            value={telefono}
+            editable={editando}
+            keyboardType="phone-pad"
+          />
+        </View>
+
         {/* Contenedor para el campo Dirección */}
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Dirección</Text>
           <TextInput
             ref={direccionRef}
             style={styles.input}
-            onChangeText={(text) => setDireccion(text)}
+            onChangeText={setDireccion}
             value={direccion}
             editable={editando}
-            onBlur={fetchProfile} // Actualiza el perfil cuando el usuario sale del campo de dirección
           />
         </View>
 
-        {/* Contenedor para el botón de Editar */}
-        {!editando && (
-          <TouchableOpacity style={[styles.button, styles.editButton]} onPress={() => setEditando(true)}>
-            <Text style={[styles.buttonText, styles.updateButtonText]}>Editar</Text>
-          </TouchableOpacity>
-        )}
-
-        {/* Mapa */}
+        {/* Contenedor para el mapa */}
         <View style={styles.mapContainer}>
           <MapView
             style={styles.map}
-            initialRegion={region}
             region={region}
-            maxZoomLevel={12}
-            minZoomLevel={9}
+            onPress={handleMapPress}
           >
-            <Marker
-              coordinate={region}
-              title="Mi Ubicación"
-              description="Aquí estoy"
-            />
+            <Marker coordinate={region} />
           </MapView>
         </View>
 
-        {/* Contenedor para los botones de acción */}
-        {editando && (
-          <View style={styles.buttonContainer}>
-            {/* Botón de Actualizar */}
-            <TouchableOpacity style={[styles.button, styles.updateButton]} onPress={handleUpdate}>
-              <Text style={[styles.buttonText, styles.updateButtonText]}>Actualizar</Text>
+        {/* Contenedor para los botones */}
+        <View style={styles.buttonContainer}>
+          {editando ? (
+            <>
+              <TouchableOpacity style={styles.button} onPress={handleUpdate}>
+                <Text style={styles.buttonText}>Actualizar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.button} onPress={handleDelete}>
+                <Text style={styles.buttonText}>Cancelar</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <TouchableOpacity style={styles.button} onPress={() => setEditando(true)}>
+              <Text style={styles.buttonText}>Editar</Text>
             </TouchableOpacity>
-
-            {/* Botón de Cancelar */}
-            <TouchableOpacity style={[styles.button, styles.deleteButton]} onPress={handleDelete}>
-              <Text style={[styles.buttonText, styles.deleteButtonText]}>Cancelar</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+          )}
+        </View>
       </View>
     </ScrollView>
   );
