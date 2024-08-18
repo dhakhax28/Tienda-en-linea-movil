@@ -46,7 +46,7 @@ const LoginScreen = ({ navigation }) => {
       formData.append('UsuarioCliente', username); // Agregar nombre de usuario a los datos del formulario
       formData.append('clave', password); // Agregar contraseña a los datos del formulario
       
-      const url = `${ip}/FontechPriv/public/cliente.php?action=logIn`; // URL para la solicitud
+      const url = `${ip}/FontechPriv/api/services/public/cliente.php?action=logIn`; // URL para la solicitud
       console.log('URL solicitada:', url); // Para verificar la URL
 
       // Hacer la solicitud a la API
