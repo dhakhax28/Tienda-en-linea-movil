@@ -18,7 +18,7 @@ import NewPasswordScreen from './src/screens/NewPasswordScreen';
 import CarritoScreen from './src/screens/CarritoScreen';
 import HistorialScreen from './src/screens/HistorialScreen';
 import ProductoScreen from './src/screens/ProductoScreen';
-import TerminosCondicionesScreen from './src/screens/Terminos&Condiciones'; // Asegúrate de que la ruta sea correcta
+import TerminosCondicionesScreen from './src/screens/Terminos&Condiciones'; 
 import DetallesProductoScreen from './src/screens/DetallesProductoScreen';
 import OfertasScreen from './src/screens/OfertasScreen';
 
