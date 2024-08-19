@@ -1,27 +1,32 @@
+// CardHistorial.js
 import React from 'react';
 import { View, Text, Image, TouchableOpacity } from 'react-native';
 import styles from '../../estilos/HistorialScreenStyles'; // Asegúrate de que la ruta sea correcta
+import * as Constantes from '../../utils/constantes';
 
-const CardHistorial = ({ item, onPress }) => {
-  return (
-    <TouchableOpacity style={styles.ofertaCard} onPress={onPress}>
-      <Image source={{ uri: item.image }} style={styles.ofertaImage} />
-      <View style={styles.ofertaDetails}>
-        <Text style={styles.ofertaTitle}>{item.title}</Text>
-        <Text style={styles.ofertaDescription}>{item.description}</Text>
-        <Text style={styles.fecha}>{item.fecha}</Text>
-        <View style={styles.ofertaPriceContainer}>
-          <Text style={styles.ofertaPrice}>${item.price.toFixed(2)}</Text>
-          {/* Renderiza un badge de descuento si el producto tiene descuento */}
-          {item.discount > 0 && (
-            <View style={styles.discountBadge}>
-              <Text style={styles.discountText}>-{item.discount}%</Text>
-            </View>
-          )}
-        </View>
+const ip = Constantes.IP;
+
+const CardHistorial = ({ item, onPress }) => (
+  <TouchableOpacity
+    style={styles.ofertaCard}
+    onPress={onPress}
+  >
+    <Image source={{ uri: `${ip}/FontechPriv/api/images/productos/${item.imagen}` }} style={styles.ofertaImage} />
+    <View style={styles.ofertaDetails}>
+      <Text style={styles.ofertaTitle}>{item.nombre_producto}</Text>
+      <Text style={styles.ofertaDescription}>Cantidad: {item.cantidad}</Text>
+      <Text style={styles.fecha}>{item.fecha_reserva}</Text>
+      <Text style={styles.subTotal}>Subtotal: ${(item.cantidad * item.precio_unitario)}</Text>
+      <View style={styles.ofertaPriceContainer}>
+        <Text style={styles.ofertaPrice}>${item.precio_unitario}</Text>
+        {item.valor_oferta > 0 && (
+          <View style={styles.discountBadge}>
+            <Text style={styles.discountText}>-{item.valor_oferta}%</Text>
+          </View>
+        )}
       </View>
-    </TouchableOpacity>
-  );
-};
+    </View>
+  </TouchableOpacity>
+);
 
 export default CardHistorial;
