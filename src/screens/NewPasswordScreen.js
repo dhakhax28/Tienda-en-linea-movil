@@ -31,7 +31,7 @@ const NewPasswordScreen = ({ route, navigation }) => {
 
     try {
       // Hace una solicitud para cambiar la contraseña
-      const response = await fetch(`${Constantes.IP}/FontechPriV/api/services/public/cliente.php?action=cambiarClaveConPin`, {
+      const response = await fetch(`${Constantes.IP}/FontechPriv/api/services/public/cliente.php?action=cambiarClaveConPin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

@@ -7,7 +7,7 @@ import * as Constantes from '../utils/constantes';
 const PasswordRecoveryScreen = ({ navigation }) => {
   // Estado para almacenar el email ingresado por el usuario
   const [email, setEmail] = useState('');
-
+  const ip = Constantes.IP;
   // Función para manejar el proceso de recuperación de contraseña
   const handleRecovery = async () => {
     // Verifica que el campo de email no esté vacío
@@ -18,7 +18,7 @@ const PasswordRecoveryScreen = ({ navigation }) => {
 
     try {
       // Realizar una solicitud POST al servidor para solicitar el PIN de recuperación
-      const response = await fetch(`${Constantes.IP}/FontechPriv/api/services/public/cliente.php?action=solicitarPinRecuperacion`, {
+      const response = await fetch(`${ip}/FontechPriv/api/services/public/cliente.php?action=solicitarPinRecuperacion`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
