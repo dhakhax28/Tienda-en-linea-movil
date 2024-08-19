@@ -1,22 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, Alert } from 'react-native';
+// screens/DashboardScreen.js
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, Image, Alert, ActivityIndicator, RefreshControl } from 'react-native';
 import styles from '../estilos/DashboardScreenStyles';
-import * as Constantes from '../utils/constantes';
 import Cards1 from '../Componets/Cards/Cards1';
 import { Ionicons } from '@expo/vector-icons';
+import * as Constantes from '../utils/constantes';
 
+// URL base de la API
+const ip = Constantes.IP;
 
 const DashboardScreen = ({ navigation }) => {
-  const ip = Constantes.IP;
-
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [greeting, setGreeting] = useState('');
+  const [userName, setUserName] = useState(''); // Estado para el nombre del usuario
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       setCurrentImageIndex(prevIndex => (prevIndex + 1) % images.length);
-    }, 5000);
+      setCurrentTime(new Date());
+    }, 1000); // Actualiza cada segundo
 
     return () => clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    const hours = currentTime.getHours();
+    if (hours < 12) {
+      setGreeting(`¡Buenos días, ${userName}!`);
+    } else if (hours < 18) {
+      setGreeting(`¡Buenas tardes, ${userName}!`);
+    } else {
+      setGreeting(`¡Buenas noches, ${userName}!`);
+    }
+  }, [currentTime, userName]);
+
+  useEffect(() => {
+    fetchProfileData();
+  }, []);
+
+  const fetchProfileData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch(`${ip}/FontechPriv/api/services/public/cliente.php?action=readProfile`);
+      const data = await response.json();
+
+      if (data.status) {
+        setUserName(data.dataset.nombre);
+      } else {
+        throw new Error(data.error || 'No se pudo obtener el perfil');
+      }
+    } catch (error) {
+      console.error('Fetch Profile Error:', error);
+      Alert.alert('Error', 'Ocurrió un error al obtener el perfil');
+    } finally {
+      setLoading(false);
+      setRefreshing(false); // Terminar la animación de recarga
+    }
+  };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchProfileData();
   }, []);
 
   const handleLogout = async () => {
@@ -55,18 +102,43 @@ const DashboardScreen = ({ navigation }) => {
     'https://images.pexels.com/photos/12563780/pexels-photo-12563780.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
   ];
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
     <ScrollView
       contentContainerStyle={styles.container}
       gestureEnabled={false}
       gestureDirection="horizontal"
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          colors={['#0000ff']} // Color del spinner de recarga
+        />
+      }
     >
+      <View style={styles.headerContainer}>
+        <Text style={styles.welcomeMessage}>{greeting}</Text>
+        <View style={styles.dateTimeContainer}>
+          <Text style={styles.dateTime}>{currentTime.toLocaleDateString()}</Text>
+          <Text style={styles.time}>{currentTime.toLocaleTimeString()}</Text>
+        </View>
+      </View>
+
       <Image
         source={{ uri: images[currentImageIndex] }}
         style={styles.banner}
       />
 
-      <Text style={styles.title}>Dashboard</Text>
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>Dashboard</Text>
+      </View>
 
       <View style={styles.grid}>
         {categories.map((category, index) => (

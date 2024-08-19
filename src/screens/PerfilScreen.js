@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+// screens/PerfilScreen.js
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Linking, RefreshControl, ActivityIndicator, Alert } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons'; // Importa Ionicons desde Expo
 import { FontAwesome } from '@expo/vector-icons'; // Importa FontAwesome desde Expo
@@ -14,6 +15,7 @@ const PerfilScreen = () => {
 
   // Función para obtener el perfil del usuario
   const fetchProfile = async () => {
+    setLoading(true); // Asegura que el loading sea verdadero durante la carga
     try {
       const response = await fetch(`${Constantes.IP}/FontechPriv/api/services/public/cliente.php?action=readProfile`, {
         method: 'GET',
@@ -27,12 +29,14 @@ const PerfilScreen = () => {
         setNombre(data.dataset.nombre);
       } else {
         console.error('Error al leer el perfil:', data.error);
+        Alert.alert('Error', 'No se pudo obtener el perfil');
       }
     } catch (error) {
       console.error('Error al conectar con la API:', error);
+      Alert.alert('Error', 'Ocurrió un error al conectar con la API');
     } finally {
       setLoading(false);
-      setRefreshing(false);
+      setRefreshing(false); // Termina la animación de recarga
     }
   };
 
@@ -61,10 +65,10 @@ const PerfilScreen = () => {
   };
 
   // Función para manejar el refresco manual
-  const handleRefresh = () => {
+  const handleRefresh = useCallback(() => {
     setRefreshing(true);
     fetchProfile();
-  };
+  }, []);
 
   if (loading) {
     return (
@@ -78,7 +82,11 @@ const PerfilScreen = () => {
     <ScrollView
       contentContainerStyle={styles.container}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          colors={['#0000ff']} // Color del spinner de recarga
+        />
       }
     >
       <View style={styles.profileContainer}>
