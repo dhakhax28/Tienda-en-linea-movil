@@ -56,7 +56,7 @@ const NewPasswordScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Cambiar contraseña</Text>
-      <Image source={require('../img/dakax.png')} style={styles.logo} />
+      <Image source={require('../img/newpassword.jpeg')} style={styles.logo} />
       <View style={styles.passwordContainer}>
         <TextInput
           style={{ flex: 1 }}

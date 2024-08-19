@@ -48,7 +48,7 @@ const PinVerificationScreen = ({ route, navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Verificar PIN</Text>
-      <Image source={require('../img/botines.png')} style={styles.logo} />
+      <Image source={require('../img/pinverification.jpeg')} style={styles.logo} />
       <TextInput
         style={styles.input}
         placeholder="Ingrese el PIN"

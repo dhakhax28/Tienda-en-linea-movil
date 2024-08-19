@@ -5,6 +5,7 @@ import * as Constantes from '../utils/constantes';
 import Cards1 from '../Componets/Cards/Cards1';
 import { Ionicons } from '@expo/vector-icons';
 
+
 const DashboardScreen = ({ navigation }) => {
   const ip = Constantes.IP;
 
@@ -20,7 +21,21 @@ const DashboardScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     try {
-      navigation.navigate('Login');
+      const url = `${ip}/FontechPriv/api/services/public/cliente.php?action=logOut`;
+      console.log('URL solicitada:', url); // Verificar la URL en la consola
+
+      const response = await fetch(url, {
+        method: 'GET',
+      });
+
+      const data = await response.json();
+
+      if (data.status) {
+        Alert.alert('Sesión cerrada exitosamente');
+        navigation.navigate('Login');
+      } else {
+        Alert.alert('Error', data.error);
+      }
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
       Alert.alert('Error', 'Ocurrió un error al cerrar sesión');

@@ -161,7 +161,7 @@ const LoginScreen = ({ navigation }) => {
       
 
       {/* Botón de inicio de sesión */}
-      <Button3 style={styles.button} onPress={() => navigation.navigate('DashboardTabs')}>
+      <Button3 style={styles.button} onPress={(handleLogin)}>
         <Text style={styles.buttonText}>Iniciar sesión</Text>
       </Button3>
 
