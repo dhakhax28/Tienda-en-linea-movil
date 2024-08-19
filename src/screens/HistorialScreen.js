@@ -17,20 +17,40 @@ const HistorialScreen = ({ navigation }) => {
         setRefreshing(true); // Inicia el estado de refrescar
         try {
             const response = await fetch(`${ip}/FontechPriv/api/services/public/pedido.php?action=readHistorials`);
-            const data = await response.json();
-            if (data.status) {
-                setHistorial(data.dataset); // Asegúrate de que 'dataset' contenga los productos comprados
+            
+            // Obtén el cuerpo de la respuesta como texto
+            const responseText = await response.text();
+            
+            // Comprueba si la respuesta contiene HTML o advertencias
+            if (responseText.startsWith('<')) {
+                console.log('Respuesta HTML:', responseText); // Imprime la respuesta para depuración
+                Alert.alert('Error', 'El servidor devolvió una página HTML en lugar de los datos esperados.');
             } else {
-                Alert.alert('Error', data.error);
+                // Filtrar y extraer solo la parte JSON de la respuesta
+                const jsonStartIndex = responseText.indexOf('{');
+                const jsonEndIndex = responseText.lastIndexOf('}') + 1;
+                
+                if (jsonStartIndex !== -1 && jsonEndIndex !== -1) {
+                    const jsonString = responseText.slice(jsonStartIndex, jsonEndIndex);
+                    const data = JSON.parse(jsonString);
+    
+                    if (data.status) {
+                        setHistorial(data.dataset); // Almacena el historial en el estado
+                    } else {
+                        Alert.alert('Error', data.error);
+                    }
+                } else {
+                    Alert.alert('Error', 'No se pudo extraer el JSON de la respuesta.');
+                }
             }
         } catch (error) {
             Alert.alert('Error', 'Ocurrió un error al obtener los datos del historial');
-            console.log(error);
+            console.log('Error al obtener datos:', error);
         } finally {
             setRefreshing(false); // Finaliza el estado de refrescar
         }
     }, [ip]);
-
+    
     // Función para manejar el evento de refrescar
     const onRefresh = useCallback(() => {
         fetchHistorial(); // Vuelve a cargar los datos del historial desde la API
