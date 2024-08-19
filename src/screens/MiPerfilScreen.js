@@ -27,7 +27,6 @@ const MiPerfilScreen = () => {
   const usernameRef = useRef(null);
   const correoRef = useRef(null);
   const direccionRef = useRef(null);
-  const telefonoRef = useRef(null);
 
   // Función para obtener y mostrar el perfil del usuario
   const fetchProfile = async () => {
@@ -41,7 +40,7 @@ const MiPerfilScreen = () => {
         setNombre(data.dataset.nombre);
         setUsername(data.dataset.usuario);
         setCorreo(data.dataset.correo);
-        setDireccion(data.dataset.direccion_cliente);
+        setDireccion(data.dataset.direccion);
 
         // Utiliza Nominatim para obtener las coordenadas reales de la dirección
         const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(data.dataset.direccion_cliente)}`;
@@ -82,19 +81,18 @@ const MiPerfilScreen = () => {
     }
   };
 
-  // Función para manejar la actualización de los datos del perfil
   const handleUpdate = async () => {
     try {
       // Crea un objeto con los datos del perfil
       const formData = new FormData();
-      formData.append('nombre', nombre);
-      formData.append('correo', correo);
-      formData.append('username', username);
-      formData.append('direccion', direccion);
-
+      formData.append('nombreCliente', nombre);
+      formData.append('correoCliente', correo);
+      formData.append('aliaCliente', username);
+      formData.append('direc', direccion);
+  
       // URL de la API para actualizar el perfil
-      const url = `${ip}/Fontechriv/api/services/public/cliente.php?action=editProfile`;
-
+      const url = `${ip}/FontechPriv/api/services/public/cliente.php?action=editProfile`;
+  
       // Realiza la solicitud POST para actualizar el perfil
       const response = await fetch(url, {
         method: 'POST',
@@ -104,10 +102,10 @@ const MiPerfilScreen = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-
+  
       const responseJson = await response.json();
       console.log('API Response:', responseJson); // Imprime la respuesta JSON
-
+  
       // Manejo de la respuesta
       if (responseJson.status === 1) {
         Alert.alert('Perfil actualizado', 'Los datos del perfil han sido actualizados exitosamente');
@@ -122,6 +120,7 @@ const MiPerfilScreen = () => {
       console.error('Error al actualizar el perfil:', error);
     }
   };
+  
 
   // Función para manejar la cancelación y limpiar los campos
   const handleDelete = () => {
@@ -129,7 +128,6 @@ const MiPerfilScreen = () => {
     setUsername('');
     setCorreo('');
     setDireccion('');
-    setTelefono('');
 
     nombreRef.current.clear();
     usernameRef.current.clear();
@@ -244,19 +242,6 @@ const MiPerfilScreen = () => {
             onChangeText={setCorreo}
             value={correo}
             editable={editando}
-          />
-        </View>
-
-        {/* Contenedor para el campo Teléfono */}
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Teléfono</Text>
-          <TextInput
-            ref={telefonoRef}
-            style={styles.input}
-            onChangeText={setTelefono}
-            value={telefono}
-            editable={editando}
-            keyboardType="phone-pad"
           />
         </View>
 
