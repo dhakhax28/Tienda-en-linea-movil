@@ -109,29 +109,37 @@ const DetallesProductoScreen = () => {
 
   const agregarAlCarrito = async () => {
     const cantidadNumerica = parseInt(cantidadProducto, 10);
+   
     if (isNaN(cantidadNumerica) || cantidadNumerica <= 0) {
       Alert.alert('Error', 'Por favor, ingresa una cantidad válida');
       return;
     }
-
+ 
+    if (cantidadNumerica > 5) {
+      Alert.alert('Error', 'La cantidad máxima permitida es 5');
+      return;
+    }
+ 
+    if (cantidadNumerica > producto.existencias_producto) {
+      Alert.alert('Error', `No hay suficiente stock. Solo hay ${producto.existencias_producto} en existencia`);
+      return;
+    }
+ 
     try {
       const formData = new FormData();
       formData.append('idProducto', idProducto);
       formData.append('cantidadProducto', cantidadProducto);
-
-      const response = await fetch(`${ip}/fontechpriv/api/services/public/pedido.php?action=createDetail`, {
+ 
+      const response = await fetch(`${ip}/FontechPriv/api/services/public/pedido.php?action=createDetail`, {
         method: 'POST',
         body: formData,
       });
-
+ 
       const data = await response.json();
-
+ 
       if (data.status) {
         Alert.alert('Éxito', 'Producto añadido al carrito');
-        navigation.navigate('Carrito', { // Navega al CarritoScreen
-          idProducto, 
-          cantidadProducto: cantidadNumerica
-        });
+        navigation.navigate('Carrito', { idProducto, cantidadProducto: cantidadNumerica });
       } else {
         Alert.alert('Error', data.message);
       }

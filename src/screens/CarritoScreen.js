@@ -7,10 +7,10 @@ import CardCarrito from '../Componets/Cards/CardCarrito';
 
 const CarritoScreen = ({ navigation }) => {
   const [carrito, setCarrito] = useState([]); // Estado para almacenar los productos en el carrito
-  const [loading, setLoading] = useState(true);// Estado para manejar el indicador de carga
+  const [loading, setLoading] = useState(true); // Estado para manejar el indicador de carga
   const [refreshing, setRefreshing] = useState(false); // Estado para manejar el indicador de refresh
   const [subtotal, setSubtotal] = useState(0); // Estado para almacenar el subtotal del carrito
-  const [descuento, setDescuento] = useState(0);// Estado para almacenar el descuento aplicado
+  const [descuento, setDescuento] = useState(0); // Estado para almacenar el descuento aplicado
 
   const ip = Constantes.IP;
   const isFocused = useIsFocused();
@@ -41,10 +41,15 @@ const CarritoScreen = ({ navigation }) => {
 
   const handleQuantityChange = async (item, type) => {
     let newCantidad = item.cantidad;
+    const totalCantidad = carrito.reduce((acc, prod) => acc + prod.cantidad, 0); // Total cantidad de productos en el carrito
 
     if (type === 'increase') {
       if (newCantidad >= 5) {
         Alert.alert('Límite alcanzado', 'No puedes agregar más de 5 productos.');
+        return;
+      }
+      if (totalCantidad >= 5) {
+        Alert.alert('Límite alcanzado', 'No puedes tener más de 5 productos en total.');
         return;
       }
       newCantidad++;
@@ -72,8 +77,6 @@ const CarritoScreen = ({ navigation }) => {
             producto.id_detalle_reserva === item.id_detalle_reserva ? { ...producto, cantidad: newCantidad } : producto
           )
         ));
-        // Eliminamos la alerta de éxito aquí
-        // Alert.alert('Éxito', data.message);
       } else {
         Alert.alert('Error', data.error || 'Ocurrió un problema al actualizar la cantidad del producto');
       }
@@ -184,9 +187,9 @@ const CarritoScreen = ({ navigation }) => {
         renderItem={({ item }) => (
           <CardCarrito
             item={item}
-            onIncrease={(item) => handleQuantityChange(item, 'increase')}
-            onDecrease={(item) => handleQuantityChange(item, 'decrease')}
-            onDelete={(idDetalle) => handleDelete(idDetalle)}
+            onIncrease={() => handleQuantityChange(item, 'increase')}
+            onDecrease={() => handleQuantityChange(item, 'decrease')}
+            onDelete={() => handleDelete(item.id_detalle_reserva)}
           />
         )}
         keyExtractor={(item) => item?.id_detalle_reserva?.toString() ?? item.id_detalle_reserva.toString()}
