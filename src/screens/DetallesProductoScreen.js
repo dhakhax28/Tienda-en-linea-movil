@@ -138,8 +138,13 @@ const DetallesProductoScreen = () => {
       const data = await response.json();
  
       if (data.status) {
-        Alert.alert('Éxito', 'Producto añadido al carrito');
-        navigation.navigate('Carrito', { idProducto, cantidadProducto: cantidadNumerica });
+        Alert.alert('Éxito', 'Producto añadido al carrito', [
+          {
+            text: 'Ok',
+            onPress: () => navigation.navigate('DashboardTabs', { screen: 'Carrito' }), // Navegar al tab 'Carrito'
+          },
+       
+        ]);
       } else {
         Alert.alert('Error', data.message);
       }
@@ -147,6 +152,8 @@ const DetallesProductoScreen = () => {
       Alert.alert('Error', 'Ocurrió un error al agregar el producto al carrito');
     }
   };
+ 
+
 
   const handleRatingPress = (star) => {
     setRating(star); // Actualiza la calificación según la estrella clickeada
