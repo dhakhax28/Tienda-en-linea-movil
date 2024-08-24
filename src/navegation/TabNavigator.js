@@ -1,4 +1,3 @@
-// src/navigation/StackNavigator.js
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
@@ -37,6 +36,7 @@ const MainStackNavigator = () => {
         <Stack.Screen name="Perfil" component={PerfilScreen} />
         <Stack.Screen name="MiPerfil" component={MiPerfilScreen} />
         <Stack.Screen name="Producto" component={ProductoScreen} />
+        <Stack.Screen name="Carrito" component={CarritoScreen} /> {/* Add this line */}
         <Stack.Screen name="Historial" component={HistorialScreen} />
         <Stack.Screen name="Ofertas" component={OfertasScreen} />
         <Stack.Screen name="TerminosyCondiciones" component={TerminosCondicionesScreen} />
