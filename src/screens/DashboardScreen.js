@@ -21,7 +21,7 @@ const DashboardScreen = ({ navigation }) => {
     const intervalId = setInterval(() => {
       setCurrentImageIndex(prevIndex => (prevIndex + 1) % images.length);
       setCurrentTime(new Date());
-    }, 1000); // Actualiza cada segundo
+    }, 5000); // Actualiza cada segundo
 
     return () => clearInterval(intervalId);
   }, []);
