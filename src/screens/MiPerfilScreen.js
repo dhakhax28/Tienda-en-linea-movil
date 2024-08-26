@@ -133,7 +133,6 @@ const MiPerfilScreen = () => {
     usernameRef.current.clear();
     correoRef.current.clear();
     direccionRef.current.clear();
-    telefonoRef.current.clear();
     setEditando(false);
     fetchProfile(); // Actualiza los datos del perfil al cancelar
   };

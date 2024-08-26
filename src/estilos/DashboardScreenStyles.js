@@ -11,7 +11,7 @@ const styles = StyleSheet.create({
   headerContainer: {
     width: '100%',
     paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingVertical: 75,
     backgroundColor: '#EEEEEE',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     width: '90%',
     height: 140,
     borderRadius: 12,
-    marginBottom: 15,
+    marginBottom: 100,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '500',
-    marginBottom: 15,
+    marginBottom: 35,
     color: '#333',
   },
   grid: {
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     position: 'absolute',
-    top: 30,
+    top: 50,
     right: 15,
   },
 });

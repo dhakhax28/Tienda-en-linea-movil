@@ -1,4 +1,3 @@
-// screens/DashboardScreen.js
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, Alert, ActivityIndicator, RefreshControl } from 'react-native';
 import styles from '../estilos/DashboardScreenStyles';
@@ -17,13 +16,22 @@ const DashboardScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Actualizar la hora cada segundo
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setCurrentImageIndex(prevIndex => (prevIndex + 1) % images.length);
+    const timeIntervalId = setInterval(() => {
       setCurrentTime(new Date());
-    }, 5000); // Actualiza cada segundo
+    }, 1000); // Actualiza cada segundo
 
-    return () => clearInterval(intervalId);
+    return () => clearInterval(timeIntervalId);
+  }, []);
+
+  // Cambiar imagen del carrusel cada 5 segundos
+  useEffect(() => {
+    const imageIntervalId = setInterval(() => {
+      setCurrentImageIndex(prevIndex => (prevIndex + 1) % images.length);
+    }, 5000); // Cambia la imagen cada 5 segundos
+
+    return () => clearInterval(imageIntervalId);
   }, []);
 
   useEffect(() => {
@@ -91,7 +99,7 @@ const DashboardScreen = ({ navigation }) => {
 
   const categories = [
     { title: 'Categorías', icon: 'grid-outline', navigateTo: 'Categorias' },
-    { title: 'Ofertas', icon: 'gift-outline', navigateTo: 'Ofertas' },
+    
     { title: 'Historial', icon: 'time-outline', navigateTo: 'Historial' },
   ];
 
