@@ -7,7 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/calentamiento.png",
+      "image": "./src/img/calentamiento.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -16,12 +16,18 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./src/img/calentamiento.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.dhakhax.Perfil_3Parejasapp"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./src/img/calentamiento.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "af4fb211-65b9-41c3-af0d-17d65d399fd3"
+      }
     }
   }
 }

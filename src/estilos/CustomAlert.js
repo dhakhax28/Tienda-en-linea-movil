@@ -7,7 +7,7 @@ const CustomAlert = ({ isVisible, message, onClose }) => {
   return (
     <Modal isVisible={isVisible} onBackdropPress={onClose} animationIn="zoomIn" animationOut="zoomOut">
       <View style={styles.alertContainer}>
-        <Image source={require('../img/fuentes.png')} style={styles.alertImage} />
+        <Image source={require('../img/calentamiento.png')} style={styles.alertImage} />
         <Text style={styles.alertMessage}>{message}</Text>
         <TouchableOpacity style={styles.closeButton} onPress={onClose}>
           <Text style={styles.closeButtonText}>OK</Text>
