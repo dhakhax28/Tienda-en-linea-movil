@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { View, Text, ScrollView, Image, Alert, TouchableOpacity } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
+import * as Constantes from '../utils/constantes';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DebouncedSearchInput from '../screens/DebouncedSearchInput';
-import CustomAlert from '../estilos/CustomAlert'; // Importar el componente de alerta personalizada
-import styles from '../estilos/RegisterScreenStyles'; // Ajusta la ruta según tu estructura de archivos
-import * as Constantes from '../utils/constantes';
+import CustomAlert from '../estilos/CustomAlert';
+import styles from '../estilos/RegisterScreenStyles';
+import ButtonofRegisters from "../Componets/Buttons/ButtonofRegisters";
+import InputsRegister from '../Componets/Inputs/InputsRegister';// Ajusta la ruta según tu estructura de archivos
 
 const RegisterScreen = () => {
   const [name, setName] = useState('');
@@ -19,8 +21,8 @@ const RegisterScreen = () => {
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [address, setAddress] = useState('');
   const [location, setLocation] = useState({
-    latitude: 13.69294,  // Latitud de San Salvador, El Salvador
-    longitude: -89.21819, // Longitud de San Salvador, El Salvador
+    latitude: 13.69294,
+    longitude: -89.21819,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
@@ -31,7 +33,6 @@ const RegisterScreen = () => {
   const ip = Constantes.IP;
 
   const handleRegister = async () => {
-    // Validación de los campos
     if (
       !name.trim() ||
       !username.trim() ||
@@ -60,7 +61,7 @@ const RegisterScreen = () => {
       formData.append('confirmarClave', confirmarClave);
       formData.append('direccionCliente', address);
 
-      const response = await fetch(`${ip}/fontechpriv/api/services/public/cliente.php?action=signUpMovil`, {
+      const response = await fetch(`${ip}/FonTechPriv/api/services/public/cliente.php?action=signUpMovil`, {
         method: 'POST',
         body: formData
       });
@@ -125,15 +126,11 @@ const RegisterScreen = () => {
   const handleClearAddress = () => {
     setAddress('');
     setLocation({
-      latitude: 13.69294,  // Latitud de San Salvador, El Salvador
-      longitude: -89.21819, // Longitud de San Salvador, El Salvador
+      latitude: 13.69294,
+      longitude: -89.21819,
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421,
     });
-  };
-
-  const handleAddressChange = (text) => {
-    setAddress(text);
   };
 
   return (
@@ -142,31 +139,28 @@ const RegisterScreen = () => {
         <Image source={require('../img/registro.png')} style={styles.logo} />
         <Text style={styles.title}>Registro</Text>
       </View>
-      <TextInput
-        style={styles.input}
-        placeholder="Nombre"
-        onChangeText={text => setName(text)}
+
+      <InputsRegister
         value={name}
+        onChangeText={setName}
+        placeholder="Nombre"
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Usuario"
-        onChangeText={text => setUsername(text)}
+      <InputsRegister
         value={username}
+        onChangeText={setUsername}
+        placeholder="Usuario"
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Correo"
-        onChangeText={text => setEmail(text)}
+      <InputsRegister
         value={email}
+        onChangeText={setEmail}
+        placeholder="Correo"
         keyboardType="email-address"
       />
       <View style={styles.passwordContainer}>
-        <TextInput
-          style={styles.passwordInput}
-          placeholder="Contraseña"
-          onChangeText={text => setPassword(text)}
+        <InputsRegister
           value={password}
+          onChangeText={setPassword}
+          placeholder="Contraseña"
           secureTextEntry={!passwordVisible}
         />
         <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)} style={styles.eyeIcon}>
@@ -174,11 +168,10 @@ const RegisterScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.passwordContainer}>
-        <TextInput
-          style={styles.passwordInput}
-          placeholder="Confirmar contraseña"
-          onChangeText={text => setConfirmarClave(text)}
+        <InputsRegister
           value={confirmarClave}
+          onChangeText={setConfirmarClave}
+          placeholder="Confirmar contraseña"
           secureTextEntry={!confirmPasswordVisible}
         />
         <TouchableOpacity onPress={() => setConfirmPasswordVisible(!confirmPasswordVisible)} style={styles.eyeIcon}>
@@ -189,7 +182,7 @@ const RegisterScreen = () => {
         <DebouncedSearchInput
           onSearch={handleSearchAddress}
           value={address}
-          onChangeText={handleAddressChange}
+          onChangeText={setAddress}
         />
         <TouchableOpacity style={styles.clearButton} onPress={handleClearAddress}>
           <Text style={styles.clearButtonText}>Limpiar</Text>
@@ -202,12 +195,8 @@ const RegisterScreen = () => {
       >
         <Marker coordinate={location} />
       </MapView>
-      <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Registrarse</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={handleLoginRedirect}>
-        <Text style={styles.loginRedirectText}>¿Ya tienes cuenta? Inicia sesión</Text>
-      </TouchableOpacity>
+      <ButtonofRegisters title="Registrarse" onPress={handleRegister} />
+      <ButtonofRegisters title="¿Ya tienes cuenta? Inicia sesión" onPress={handleLoginRedirect} />
       <CustomAlert
         isVisible={alertVisible}
         message={alertMessage}

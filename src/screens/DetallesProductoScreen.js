@@ -23,7 +23,7 @@ const DetallesProductoScreen = () => {
     try {
       const formData = new FormData();
       formData.append('idProducto', idProducto);
-      const response = await fetch(`${ip}/fontechpriv/api/services/public/producto.php?action=readOne`, {
+      const response = await fetch(`${ip}/FonTechPriv/api/services/public/producto.php?action=readOne`, {
         method: 'POST',
         body: formData,
       });
@@ -45,7 +45,7 @@ const DetallesProductoScreen = () => {
       const formData = new FormData();
       formData.append('idProducto1', idProducto);
       
-      const url = `${ip}/fontechpriv/api/services/public/comentario.php?action=verifComent`;
+      const url = `${ip}/FonTechPriv/api/services/public/comentario.php?action=verifComent`;
       console.log('URL solicitada:', url); // Para verificar la URL
 
       const response = await fetch(url, {
@@ -76,7 +76,7 @@ const DetallesProductoScreen = () => {
     try {
       const formData = new FormData();
       formData.append('idProducto1', idProducto);
-      const response = await fetch(`${ip}/fontechpriv/api/services/public/comentario.php?action=readAllByProducto`, {
+      const response = await fetch(`${ip}/FonTechPriv/api/services/public/comentario.php?action=readAllByProducto`, {
         method: 'POST',
         body: formData,
       });
@@ -130,7 +130,7 @@ const DetallesProductoScreen = () => {
       formData.append('idProducto', idProducto);
       formData.append('cantidadProducto', cantidadProducto);
  
-      const response = await fetch(`${ip}/FontechPriv/api/services/public/pedido.php?action=createDetail`, {
+      const response = await fetch(`${ip}/FonTechPriv/api/services/public/pedido.php?action=createDetail`, {
         method: 'POST',
         body: formData,
       });
@@ -195,7 +195,7 @@ const DetallesProductoScreen = () => {
       formData.append('starValue', rating);
       formData.append('idProducto1', idProducto);
 
-      const response = await fetch(`${ip}/fontechpriv/api/services/public/comentario.php?action=createComentario`, {
+      const response = await fetch(`${ip}/FonTechPriv/api/services/public/comentario.php?action=createComentario`, {
         method: 'POST',
         body: formData
       });
@@ -225,7 +225,7 @@ const DetallesProductoScreen = () => {
         <Ionicons name="arrow-back" size={24} color="#000" />
       </TouchableOpacity>
 
-      <Image source={{ uri: `${ip}/fontechpriv/api/images/productos/${producto.imagen}` }} style={styles.image} />
+      <Image source={{ uri: `${ip}/FonTechPriv/api/images/productos/${producto.imagen}` }} style={styles.image} />
 
       <Text style={styles.title}>{producto.nombre_producto}</Text>
       <Text style={styles.description}>{producto.descripcion}</Text>

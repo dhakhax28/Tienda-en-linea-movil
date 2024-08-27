@@ -17,7 +17,7 @@ const PerfilScreen = () => {
   const fetchProfile = async () => {
     setLoading(true); // Asegura que el loading sea verdadero durante la carga
     try {
-      const response = await fetch(`${Constantes.IP}/FontechPriv/api/services/public/cliente.php?action=readProfile`, {
+      const response = await fetch(`${Constantes.IP}/FonTechPriv/api/services/public/cliente.php?action=readProfile`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

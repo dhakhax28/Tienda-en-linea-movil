@@ -18,7 +18,7 @@ const CarritoScreen = ({ navigation }) => {
   const fetchCarrito = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${ip}/FontechPriv/api/services/public/pedido.php?action=readDetail`);
+      const response = await fetch(`${ip}/FonTechPriv/api/services/public/pedido.php?action=readDetail`);
       const data = await response.json();
       if (data.status) {
         setCarrito(data.dataset);
@@ -64,7 +64,7 @@ const CarritoScreen = ({ navigation }) => {
       formData.append('idDetalle', item.id_detalle_reserva.toString());
       formData.append('cantidadProducto', newCantidad.toString());
 
-      const response = await fetch(`${ip}/FontechPriv/api/services/public/pedido.php?action=updateDetail`, {
+      const response = await fetch(`${ip}/FonTechPriv/api/services/public/pedido.php?action=updateDetail`, {
         method: 'POST',
         body: formData,
       });
@@ -91,7 +91,7 @@ const CarritoScreen = ({ navigation }) => {
       const formData = new FormData();
       formData.append('idDetalle', idDetalle);
 
-      const response = await fetch(`${ip}/FontechPriv/api/services/public/pedido.php?action=deleteDetail`, {
+      const response = await fetch(`${ip}/FonTechPriv/api/services/public/pedido.php?action=deleteDetail`, {
         method: 'POST',
         body: formData,
       });
@@ -150,7 +150,7 @@ const CarritoScreen = ({ navigation }) => {
     }
 
     try {
-      const response = await fetch(`${ip}/FontechPriv/api/services/public/pedido.php?action=finishOrder`, {
+      const response = await fetch(`${ip}/FonTechPriv/api/services/public/pedido.php?action=finishOrder`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

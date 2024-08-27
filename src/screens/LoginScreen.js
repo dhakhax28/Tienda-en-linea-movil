@@ -46,7 +46,7 @@ const LoginScreen = ({ navigation }) => {
       formData.append('UsuarioCliente', username); // Agregar nombre de usuario a los datos del formulario
       formData.append('clave', password); // Agregar contraseña a los datos del formulario
       
-      const url = `${ip}/FontechPriv/api/services/public/cliente.php?action=logIn`; // URL para la solicitud
+      const url = `${ip}/FonTechPriv/api/services/public/cliente.php?action=logIn`; // URL para la solicitud
       console.log('URL solicitada:', url); // Para verificar la URL
 
       // Hacer la solicitud a la API
@@ -87,7 +87,7 @@ const LoginScreen = ({ navigation }) => {
   // Función para manejar el cierre de sesión
   const handleLogout = async () => {
     try {
-      const url = `${ip}/FontechPriv/api/services/public/cliente.php?action=logOut`;
+      const url = `${ip}/FonTechPriv/api/services/public/cliente.php?action=logOut`;
       console.log('URL solicitada:', url); // Verificar la URL en la consola
 
       const response = await fetch(url, {

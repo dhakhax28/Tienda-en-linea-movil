@@ -28,27 +28,25 @@ const MiPerfilScreen = () => {
   const correoRef = useRef(null);
   const direccionRef = useRef(null);
 
-  // Función para obtener y mostrar el perfil del usuario
+
   const fetchProfile = async () => {
     try {
-      const response = await fetch(`${ip}/FontechPriv/api/services/public/cliente.php?action=readProfile`);
+      const response = await fetch(`${ip}/FonTechPriv/api/services/public/cliente.php?action=readProfile`);
       const data = await response.json();
-
-      console.log('Perfil Data:', data);
-
+  
       if (data.status) {
         setNombre(data.dataset.nombre);
         setUsername(data.dataset.usuario);
         setCorreo(data.dataset.correo);
         setDireccion(data.dataset.direccion);
-
+  
         // Utiliza Nominatim para obtener las coordenadas reales de la dirección
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(data.dataset.direccion_cliente)}`;
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(data.dataset.direccion)}`;
         const geoResponse = await fetch(url);
         const geoData = await geoResponse.json();
-
-        console.log('Geocode Data:', geoData);
-
+  
+        console.log('Geolocation Data:', geoData); // Verifica qué datos devuelve la API
+        
         if (geoData.length > 0) {
           const { lat, lon } = geoData[0];
           const newRegion = {
@@ -57,8 +55,7 @@ const MiPerfilScreen = () => {
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
           };
-          setRegion(newRegion);
-          console.log('New Region:', newRegion);
+          setRegion(newRegion); // Esto actualizará el mapa
         } else {
           setRegion({
             latitude: 13.6929,
@@ -66,22 +63,29 @@ const MiPerfilScreen = () => {
             latitudeDelta: 0.1,
             longitudeDelta: 0.1,
           });
-          console.log('Default Region:', region);
           Alert.alert('Error', 'No se encontró la ubicación');
         }
       } else {
         Alert.alert('Error', data.error);
       }
     } catch (error) {
-      console.error('Fetch Profile Error:', error);
       Alert.alert('Error', 'Ocurrió un error al obtener el perfil');
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   };
+  
+  
 
+  // Función para manejar la actualización de los datos del perfil
   const handleUpdate = async () => {
+    // Validación de campos vacíos
+    if (!nombre || !username || !correo || !direccion) {
+      Alert.alert('Error', 'Todos los campos deben ser llenados');
+      return;
+    }
+
     try {
       // Crea un objeto con los datos del perfil
       const formData = new FormData();
@@ -89,10 +93,10 @@ const MiPerfilScreen = () => {
       formData.append('correoCliente', correo);
       formData.append('aliaCliente', username);
       formData.append('direc', direccion);
-  
+
       // URL de la API para actualizar el perfil
-      const url = `${ip}/FontechPriv/api/services/public/cliente.php?action=editProfile`;
-  
+      const url = `${ip}/FonTechPriv/api/services/public/cliente.php?action=editProfile`;
+
       // Realiza la solicitud POST para actualizar el perfil
       const response = await fetch(url, {
         method: 'POST',
@@ -102,10 +106,10 @@ const MiPerfilScreen = () => {
           'Content-Type': 'multipart/form-data',
         },
       });
-  
+
       const responseJson = await response.json();
       console.log('API Response:', responseJson); // Imprime la respuesta JSON
-  
+
       // Manejo de la respuesta
       if (responseJson.status === 1) {
         Alert.alert('Perfil actualizado', 'Los datos del perfil han sido actualizados exitosamente');
@@ -120,20 +124,16 @@ const MiPerfilScreen = () => {
       console.error('Error al actualizar el perfil:', error);
     }
   };
-  
 
   // Función para manejar la cancelación y limpiar los campos
   const handleDelete = () => {
+    // Limpiar los valores de los campos directamente mediante el estado
     setNombre('');
     setUsername('');
     setCorreo('');
     setDireccion('');
-
-    nombreRef.current.clear();
-    usernameRef.current.clear();
-    correoRef.current.clear();
-    direccionRef.current.clear();
-    telefonoRef.current.clear();
+  
+    // Limpiar el valor de los campos de entrada usando las referencias no es necesario
     setEditando(false);
     fetchProfile(); // Actualiza los datos del perfil al cancelar
   };
@@ -183,6 +183,13 @@ const MiPerfilScreen = () => {
     fetchProfile();
   }, []);
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
   if (loading) {
     return (
       <View style={styles.loadingContainer}>

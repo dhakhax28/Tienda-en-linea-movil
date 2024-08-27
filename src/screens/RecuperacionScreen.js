@@ -18,7 +18,7 @@ const PasswordRecoveryScreen = ({ navigation }) => {
 
     try {
       // Realizar una solicitud POST al servidor para solicitar el PIN de recuperación
-      const response = await fetch(`${ip}/FontechPriv/api/services/public/cliente.php?action=solicitarPinRecuperacion`, {
+      const response = await fetch(`${ip}/FonTechPriv/api/services/public/cliente.php?action=solicitarPinRecuperacion`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

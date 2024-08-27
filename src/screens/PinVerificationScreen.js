@@ -20,7 +20,7 @@ const PinVerificationScreen = ({ route, navigation }) => {
       }
 
       // Realizar una solicitud POST al servidor para verificar el PIN
-      const response = await fetch(`${Constantes.IP}/FontechPriv/api/services/public/cliente.php?action=verificarPin`, {
+      const response = await fetch(`${Constantes.IP}/FonTechPriv/api/services/public/cliente.php?action=verificarPin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',

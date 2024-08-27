@@ -52,7 +52,7 @@ const DashboardScreen = ({ navigation }) => {
   const fetchProfileData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${ip}/FontechPriv/api/services/public/cliente.php?action=readProfile`);
+      const response = await fetch(`${ip}/FonTechPriv/api/services/public/cliente.php?action=readProfile`);
       const data = await response.json();
 
       if (data.status) {
@@ -76,7 +76,7 @@ const DashboardScreen = ({ navigation }) => {
 
   const handleLogout = async () => {
     try {
-      const url = `${ip}/FontechPriv/api/services/public/cliente.php?action=logOut`;
+      const url = `${ip}/FonTechPriv/api/services/public/cliente.php?action=logOut`;
       console.log('URL solicitada:', url); // Verificar la URL en la consola
 
       const response = await fetch(url, {

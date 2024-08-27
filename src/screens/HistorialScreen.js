@@ -16,7 +16,7 @@ const HistorialScreen = ({ navigation }) => {
     const fetchHistorial = useCallback(async () => {
         setRefreshing(true); // Inicia el estado de refrescar
         try {
-            const response = await fetch(`${ip}/FontechPriv/api/services/public/pedido.php?action=readHistorials`);
+            const response = await fetch(`${ip}/FonTechPriv/api/services/public/pedido.php?action=readHistorials`);
             
             // Obtén el cuerpo de la respuesta como texto
             const responseText = await response.text();
