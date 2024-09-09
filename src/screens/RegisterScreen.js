@@ -1,17 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { View, Text, ScrollView, Image, Alert, TouchableOpacity } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import axios from 'axios';
-import * as Location from 'expo-location'; // Importar para permisos
 import * as Constantes from '../utils/constantes';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import DebouncedSearchInput from '../screens/DebouncedSearchInput';
 import CustomAlert from '../estilos/CustomAlert';
 import styles from '../estilos/RegisterScreenStyles';
 import ButtonofRegisters from "../Componets/Buttons/ButtonofRegisters";
-import InputsRegister from '../Componets/Inputs/InputsRegister';
-
+import InputsRegister from '../Componets/Inputs/InputsRegister'; // Ajusta la ruta según tu estructura de archivos
+ 
 const RegisterScreen = () => {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
@@ -29,29 +28,10 @@ const RegisterScreen = () => {
   });
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-
+ 
   const navigation = useNavigation();
   const ip = Constantes.IP;
-  const apiKey = "052db57c37214995836949fa033d4518"; // Clave de OpenCage
-
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permiso de ubicación requerido', 'La aplicación necesita acceso a tu ubicación.');
-        return;
-      }
-
-      let { coords } = await Location.getCurrentPositionAsync({});
-      setLocation({
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      });
-    })();
-  }, []);
-
+ 
   const handleRegister = async () => {
     if (
       !name.trim() ||
@@ -65,13 +45,13 @@ const RegisterScreen = () => {
       setAlertVisible(true);
       return;
     }
-
+ 
     if (password !== confirmarClave) {
       setAlertMessage('Las contraseñas no coinciden');
       setAlertVisible(true);
       return;
     }
-
+ 
     try {
       const formData = new FormData();
       formData.append('nombreCliente', name);
@@ -80,12 +60,12 @@ const RegisterScreen = () => {
       formData.append('claveCliente', password);
       formData.append('confirmarClave', confirmarClave);
       formData.append('direccionCliente', address);
-
+ 
       const response = await fetch(`${ip}/FonTechPriv/api/services/public/cliente.php?action=signUpMovil`, {
         method: 'POST',
         body: formData
       });
-
+ 
       const data = await response.json();
       if (data.status) {
         setAlertMessage('Usuario creado correctamente');
@@ -100,11 +80,11 @@ const RegisterScreen = () => {
       setAlertVisible(true);
     }
   };
-
+ 
   const handleLoginRedirect = () => {
     navigation.navigate('Login');
   };
-
+ 
   const handleMapPress = async (event) => {
     const { latitude, longitude } = event.nativeEvent.coordinate;
     setLocation({
@@ -112,11 +92,11 @@ const RegisterScreen = () => {
       latitude,
       longitude,
     });
-
+ 
     try {
-      const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}`);
-      if (response.data && response.data.results && response.data.results.length > 0) {
-        const formattedAddress = response.data.results[0].formatted;
+const response = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`);
+      if (response.data && response.data.display_name) {
+        const formattedAddress = response.data.display_name;
         setAddress(formattedAddress);
       } else {
         setAddress('Dirección no disponible');
@@ -126,30 +106,23 @@ const RegisterScreen = () => {
       setAddress('Error al obtener la dirección');
     }
   };
-
+ 
   const handleSearchAddress = async (text) => {
-    if (!text || text.trim() === '') {
-      console.log('La consulta de búsqueda está vacía.');
-      return;
-    }
-
     try {
-      const response = await axios.get(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(text)}&key=${apiKey}`);
-      if (response.data && response.data.results.length > 0) {
-        const { lat, lng } = response.data.results[0].geometry;
+const response = await axios.get(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(text)}&format=json&addressdetails=1`);
+      if (response.data && response.data.length > 0) {
+        const { lat, lon } = response.data[0];
         setLocation({
           ...location,
           latitude: parseFloat(lat),
-          longitude: parseFloat(lng),
+          longitude: parseFloat(lon),
         });
-      } else {
-        console.log('No se encontraron resultados.');
       }
     } catch (error) {
-      console.error('Error al buscar la dirección:', error.response ? error.response.data : error.message);
+      console.error('Error al buscar la dirección:', error);
     }
   };
-
+ 
   const handleClearAddress = () => {
     setAddress('');
     setLocation({
@@ -159,14 +132,14 @@ const RegisterScreen = () => {
       longitudeDelta: 0.0421,
     });
   };
-
+ 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.titleContainer}>
         <Image source={require('../img/registro.png')} style={styles.logo} />
         <Text style={styles.title}>Registro</Text>
       </View>
-
+ 
       <InputsRegister
         value={name}
         onChangeText={setName}
@@ -219,14 +192,11 @@ const RegisterScreen = () => {
         style={styles.map}
         region={location}
         onPress={handleMapPress}
-        showsUserLocation={true}
       >
         <Marker coordinate={location} />
       </MapView>
       <ButtonofRegisters title="Registrarse" onPress={handleRegister} />
-      <Text style={styles.loginText} onPress={handleLoginRedirect}>
-        ¿Ya tienes una cuenta? Inicia sesión
-      </Text>
+      <ButtonofRegisters title="¿Ya tienes cuenta? Inicia sesión" onPress={handleLoginRedirect} />
       <CustomAlert
         isVisible={alertVisible}
         message={alertMessage}
@@ -235,5 +205,5 @@ const RegisterScreen = () => {
     </ScrollView>
   );
 };
-
+ 
 export default RegisterScreen;

@@ -12,14 +12,20 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Esta aplicación necesita acceder a tu ubicación para mostrarla en el mapa."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./src/img/calentamiento.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.dhakhax.Perfil_3Parejasapp"
+      "package": "com.dhakhax.Perfil_3Parejasapp",
+      "permissions": [
+        "ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "favicon": "./src/img/calentamiento.png"
@@ -28,7 +34,7 @@
       "eas": {
         "projectId": "af4fb211-65b9-41c3-af0d-17d65d399fd3"
       },
-         "googleMapsApiKey": "AIzaSyCSk9RV--DRre2uYu0d-K24CQlJbv1s_UU"
+      "googleMapsApiKey": "AIzaSyCSk9RV--DRre2uYu0d-K24CQlJbv1s_UU"
     }
   }
 }
