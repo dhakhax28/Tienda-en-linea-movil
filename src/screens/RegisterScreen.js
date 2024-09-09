@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { View, Text, ScrollView, Image, Alert, TouchableOpacity } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
