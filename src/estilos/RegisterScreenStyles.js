@@ -21,6 +21,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
   },
+  loginText: {
+    fontSize: 16,
+    color: '#007BFF', // Cambia el color según tu diseño
+    textAlign: 'center',
+    marginVertical: 20,
+  },
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',

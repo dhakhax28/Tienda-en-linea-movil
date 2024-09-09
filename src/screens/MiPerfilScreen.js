@@ -6,6 +6,7 @@ import * as Constantes from '../utils/constantes';
 
 const MiPerfilScreen = () => {
   const ip = Constantes.IP;
+  const apiKeyOpenCage = '052db57c37214995836949fa033d4518'; // Tu clave API de OpenCage
 
   // Estados para los datos del perfil
   const [nombre, setNombre] = useState('');
@@ -28,30 +29,29 @@ const MiPerfilScreen = () => {
   const correoRef = useRef(null);
   const direccionRef = useRef(null);
 
-
   const fetchProfile = async () => {
     try {
       const response = await fetch(`${ip}/FonTechPriv/api/services/public/cliente.php?action=readProfile`);
       const data = await response.json();
-  
+
       if (data.status) {
         setNombre(data.dataset.nombre);
         setUsername(data.dataset.usuario);
         setCorreo(data.dataset.correo);
         setDireccion(data.dataset.direccion);
-  
-        // Utiliza Nominatim para obtener las coordenadas reales de la dirección
-        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(data.dataset.direccion)}`;
+
+        // Utiliza OpenCage para obtener las coordenadas reales de la dirección
+        const url = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(data.dataset.direccion)}&key=${apiKeyOpenCage}`;
         const geoResponse = await fetch(url);
         const geoData = await geoResponse.json();
-  
+
         console.log('Geolocation Data:', geoData); // Verifica qué datos devuelve la API
-        
-        if (geoData.length > 0) {
-          const { lat, lon } = geoData[0];
+
+        if (geoData.results.length > 0) {
+          const { lat, lng } = geoData.results[0].geometry;
           const newRegion = {
             latitude: parseFloat(lat),
-            longitude: parseFloat(lon),
+            longitude: parseFloat(lng),
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
           };
@@ -75,8 +75,6 @@ const MiPerfilScreen = () => {
       setRefreshing(false);
     }
   };
-  
-  
 
   // Función para manejar la actualización de los datos del perfil
   const handleUpdate = async () => {
@@ -132,7 +130,7 @@ const MiPerfilScreen = () => {
     setUsername('');
     setCorreo('');
     setDireccion('');
-  
+
     // Limpiar el valor de los campos de entrada usando las referencias no es necesario
     setEditando(false);
     fetchProfile(); // Actualiza los datos del perfil al cancelar
@@ -141,14 +139,14 @@ const MiPerfilScreen = () => {
   // Función para obtener la dirección basada en las coordenadas
   const reverseGeocode = async (lat, lon) => {
     try {
-      const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+      const url = `https://api.opencagedata.com/geocode/v1/json?lat=${lat}&lon=${lon}&key=${apiKeyOpenCage}`;
       const response = await fetch(url);
       const data = await response.json();
 
       console.log('Reverse Geocode Data:', data);
 
-      if (data && data.address) {
-        const address = `${data.address.road || ''}, ${data.address.city || ''}, ${data.address.country || ''}`;
+      if (data.results.length > 0) {
+        const address = `${data.results[0].formatted}`;
         setDireccion(address);
       } else {
         Alert.alert('Error', 'No se encontró la dirección para esta ubicación');
@@ -183,13 +181,6 @@ const MiPerfilScreen = () => {
     fetchProfile();
   }, []);
 
-  if (loading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -264,26 +255,26 @@ const MiPerfilScreen = () => {
           />
         </View>
 
-        {/* Contenedor para el mapa */}
+        {/* Mapa */}
         <View style={styles.mapContainer}>
           <MapView
             style={styles.map}
             region={region}
             onPress={handleMapPress}
           >
-            <Marker coordinate={region} />
+            <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
           </MapView>
         </View>
 
-        {/* Contenedor para los botones */}
+        {/* Botones */}
         <View style={styles.buttonContainer}>
           {editando ? (
             <>
-              <TouchableOpacity style={styles.button} onPress={handleUpdate}>
-                <Text style={styles.buttonText}>Actualizar</Text>
+              <TouchableOpacity style={styles.updateButton} onPress={handleUpdate}>
+                <Text style={styles.updateButtonText}>Actualizar</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.button} onPress={handleDelete}>
-                <Text style={styles.buttonText}>Cancelar</Text>
+              <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+                <Text style={styles.deleteButtonText}>Cancelar</Text>
               </TouchableOpacity>
             </>
           ) : (
