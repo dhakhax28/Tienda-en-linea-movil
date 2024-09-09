@@ -10,6 +10,7 @@ import CustomAlert from '../estilos/CustomAlert';
 import styles from '../estilos/RegisterScreenStyles';
 import ButtonofRegisters from "../Componets/Buttons/ButtonofRegisters";
 import InputsRegister from '../Componets/Inputs/InputsRegister'; // Ajusta la ruta según tu estructura de archivos
+import * as Location from 'expo-location';
  
 const RegisterScreen = () => {
   const [name, setName] = useState('');
@@ -132,6 +133,16 @@ const response = await axios.get(`https://nominatim.openstreetmap.org/search?q=$
       longitudeDelta: 0.0421,
     });
   };
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setAlertMessage('Se denegó el permiso para acceder a la ubicación');
+        setAlertVisible(true);
+      }
+    })();
+  }, []);
  
   return (
     <ScrollView contentContainerStyle={styles.container}>

@@ -25,7 +25,12 @@
       "package": "com.dhakhax.Perfil_3Parejasapp",
       "permissions": [
         "ACCESS_FINE_LOCATION"
-      ]
+      ],
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCSk9RV--DRre2uYu0d-K24CQlJbv1s_UU"
+        }
+      }
     },
     "web": {
       "favicon": "./src/img/calentamiento.png"
@@ -33,8 +38,7 @@
     "extra": {
       "eas": {
         "projectId": "af4fb211-65b9-41c3-af0d-17d65d399fd3"
-      },
-      "googleMapsApiKey": "AIzaSyCSk9RV--DRre2uYu0d-K24CQlJbv1s_UU"
+      }
     }
   }
 }
